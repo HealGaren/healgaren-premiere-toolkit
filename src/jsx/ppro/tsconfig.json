@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "target": "es3",
-    "noLib": true,
+    "lib": ["ES5"],
     "strict": true,
     "types": [
       "../global",

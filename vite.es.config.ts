@@ -6,6 +6,7 @@ import { jsxInclude, jsxBin, jsxPonyfill } from "vite-cep-plugin";
 import { CEP_Config } from "vite-cep-plugin";
 import json from "@rollup/plugin-json";
 import path from "path";
+import {outputEncodingPlugin} from "./rollupOutputEncodingPlugin";
 
 const GLOBAL_THIS = "thisObj";
 
@@ -37,7 +38,7 @@ export const extendscriptConfig = (
         exclude: /node_modules/,
         babelrc: false,
         babelHelpers: "inline",
-        presets: ["@babel/preset-env", "@babel/preset-typescript"],
+        presets: ["babel-preset-extendscript", "@babel/preset-env", "@babel/preset-typescript"],
         plugins: [
           "@babel/plugin-syntax-dynamic-import",
           "@babel/plugin-proposal-class-properties",
@@ -48,6 +49,7 @@ export const extendscriptConfig = (
         iife: true,
         globalThis: GLOBAL_THIS,
       }),
+      outputEncodingPlugin({encoding: 'utf16le'}),
       jsxBin(isPackage ? cepConfig.zxp.jsxBin : cepConfig.build?.jsxBin),
     ],
   };

@@ -2,8 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import { initBolt } from "../lib/utils/bolt";
 
-
-import Setting from "./setting";
+import Setting from "./Setting";
 
 initBolt();
 
