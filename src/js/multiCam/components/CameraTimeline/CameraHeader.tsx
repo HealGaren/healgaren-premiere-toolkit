@@ -93,7 +93,7 @@ export const CameraHeader: React.FC<Props> = ({
                             type="number"
                             value={trackNumber}
                             onChange={(e) => onTrackNumberChange(Number(e.target.value))}
-                            className="w-12 px-1.5 py-0.5 bg-neutral-700 text-white rounded text-right"
+                            className="w-16 px-2 py-1 bg-neutral-700 text-white rounded text-right"
                             min="0"
                         />
                     </div>
@@ -104,7 +104,7 @@ export const CameraHeader: React.FC<Props> = ({
                                 type="number"
                                 value={offset}
                                 onChange={(e) => onOffsetChange(Number(e.target.value))}
-                                className="w-16 px-1.5 py-0.5 bg-neutral-700 text-white rounded text-right"
+                                className="w-20 px-2 py-1 bg-neutral-700 text-white rounded text-right"
                             />
                             {onFetchTrackOffset && (
                                 <button
