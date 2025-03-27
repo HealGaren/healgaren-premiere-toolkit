@@ -57,35 +57,35 @@ export const VideoClip: React.FC<Props> = ({
         ${overlappingClips?.length ? 'border border-red-500/50' : ''}
         ${isPremiereSelected 
           ? 'bg-blue-900/30 shadow-[inset_0_0_0_1px_rgba(59,130,246,0.3)]' 
-          : 'bg-gray-700'
+          : 'bg-neutral-700'
         }`}
     >
       {isFirstInGroup && group && (
-        <div className="absolute -top-3 left-4 bg-gray-800 px-2 py-1 rounded text-xs flex items-center gap-2">
+        <div className="absolute -top-3 left-4 bg-neutral-800 px-2 py-1 rounded text-xs flex items-center gap-2">
           <span className="text-green-500">Grouped</span>
           <input
             type="number"
             value={group.offset}
             onChange={(e) => onGroupOffsetChange?.(Number(e.target.value))}
-            className="w-20 px-2 py-0.5 bg-gray-700 text-white rounded text-xs"
+            className="w-20 px-2 py-0.5 bg-neutral-700 text-white rounded text-xs"
             step="1"
           />
-          <span className="text-gray-400">ms</span>
+          <span className="text-neutral-400">ms</span>
           <button
             onClick={onGroupDelete}
-            className="p-1 hover:bg-gray-600 rounded transition-colors"
+            className="p-1 hover:bg-neutral-600 rounded transition-colors"
           >
             <Unlink size={12} />
           </button>
         </div>
       )}
-      <div className="flex justify-between text-sm text-gray-300 mb-1">
+      <div className="flex justify-between text-sm text-neutral-300 mb-1">
         <div className="flex items-center gap-2">
           <input
             type="checkbox"
             checked={isSelected}
             onChange={onSelect}
-            className="rounded border-gray-600"
+            className="rounded border-neutral-600"
           />
           <span>{file.projectItem.name}</span>
           {isPremiereSelected && (
@@ -102,21 +102,21 @@ export const VideoClip: React.FC<Props> = ({
           <div>End: {formatTime(adjustedEndTime)}</div>
         </div>
         <div className="flex items-center gap-2 mt-2">
-          <label className="text-gray-400">Clip offset:</label>
+          <label className="text-neutral-400">Clip offset:</label>
           <input
             type="number"
             value={userData.clipOffset}
             onChange={(e) => onClipOffsetChange(file.trackItem.nodeId, Number(e.target.value))}
-            className="w-20 px-2 py-1 bg-gray-600 text-white rounded text-xs"
+            className="w-20 px-2 py-1 bg-neutral-600 text-white rounded text-xs"
             step="1"
           />
-          <span className="text-gray-400">ms</span>
+          <span className="text-neutral-400">ms</span>
         </div>
       </div>
 
       {/* Warnings Section */}
       {(overlappingClips?.length || isTrimmed) && (
-        <div className="mt-2 pt-2 border-t border-gray-600/50 space-y-1.5">
+        <div className="mt-2 pt-2 border-t border-neutral-600/50 space-y-1.5">
           {overlappingClips?.length && (
             <div className="flex items-start gap-1.5 text-xs text-red-400">
               <AlertTriangle size={14} className="mt-0.5 flex-shrink-0" />

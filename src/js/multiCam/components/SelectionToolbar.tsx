@@ -18,8 +18,8 @@ export const SelectionToolbar: React.FC<Props> = ({
   if (selectedFiles.length === 0) return null;
 
   return (
-    <div className="fixed bottom-4 left-1/2 -translate-x-1/2 bg-gray-800 rounded-lg shadow-lg border border-gray-700 p-3 flex items-center gap-4 z-50">
-      <div className="text-sm text-gray-300">
+    <div className="fixed bottom-4 left-1/2 -translate-x-1/2 bg-neutral-800 rounded-lg shadow-lg border border-neutral-700 p-3 flex items-center gap-4 z-50">
+      <div className="text-sm text-neutral-300">
         {selectedFiles.length} item{selectedFiles.length > 1 ? 's' : ''} selected
       </div>
       
@@ -35,7 +35,7 @@ export const SelectionToolbar: React.FC<Props> = ({
       
       <button
         onClick={onClearSelection}
-        className="flex items-center gap-1.5 px-2 py-1 hover:bg-gray-700 rounded text-sm transition-colors text-gray-400 hover:text-white"
+        className="flex items-center gap-1.5 px-2 py-1 hover:bg-neutral-700 rounded text-sm transition-colors text-neutral-400 hover:text-white"
       >
         <X size={14} />
         <span>Clear</span>

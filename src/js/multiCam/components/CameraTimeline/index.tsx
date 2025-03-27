@@ -49,21 +49,21 @@ export const CameraTimeline: React.FC<Props> = ({
   const timelineClips = useTimelineCalculations(camera, videoFiles);
 
   return (
-      <div className="mb-6 bg-gray-800 rounded-lg">
+      <div className="mb-6 bg-neutral-800 rounded-lg">
         <div className="flex items-start">
           <button
               onClick={() => setIsExpanded(!isExpanded)}
-              className="mt-4 ml-4 p-2 hover:bg-gray-700/50 rounded-lg transition-colors group"
+              className="mt-4 ml-4 p-2 hover:bg-neutral-700/50 rounded-lg transition-colors group"
           >
             {isExpanded ? (
                 <ChevronDown
                     size={16}
-                    className="text-gray-400 transition-transform group-hover:text-gray-200 group-hover:scale-110"
+                    className="text-neutral-400 transition-transform group-hover:text-neutral-200 group-hover:scale-110"
                 />
             ) : (
                 <ChevronRight
                     size={16}
-                    className="text-gray-400 transition-transform group-hover:text-gray-200 group-hover:scale-110"
+                    className="text-neutral-400 transition-transform group-hover:text-neutral-200 group-hover:scale-110"
                 />
             )}
           </button>
@@ -81,7 +81,7 @@ export const CameraTimeline: React.FC<Props> = ({
             />
 
             {!isExpanded && (
-                <div className="text-sm text-gray-400">
+                <div className="text-sm text-neutral-400">
                   <div className="flex items-center gap-4">
                     <span>Track {camera.trackNumber}</span>
                     <span>Offset {camera.offset}s</span>
@@ -116,7 +116,7 @@ export const CameraTimeline: React.FC<Props> = ({
 
               <div className="space-y-2">
                 {camera.files.length === 0 && !isLoading ? (
-                    <div className="text-center py-8 text-gray-400">
+                    <div className="text-center py-8 text-neutral-400">
                       <p>No videos added yet.</p>
                       <p className="text-sm mt-1">Click "새 영상 추가" to import videos.</p>
                     </div>

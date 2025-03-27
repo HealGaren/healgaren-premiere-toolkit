@@ -198,7 +198,7 @@ export function MultiCam({defaultActiveSequence}: Props) {
     return (
         <div
             ref={scrollContainerRef}
-            className={`min-h-screen bg-gray-900 text-white p-4 ${
+            className={`min-h-screen bg-neutral-900 text-white p-4 ${
                 isSyncing ? 'opacity-50 pointer-events-none' : ''
             }`}
         >
@@ -271,7 +271,7 @@ export function MultiCam({defaultActiveSequence}: Props) {
                             <button
                                 onClick={handleAddCamera}
                                 disabled={isInitialLoading || isSyncing}
-                                className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gray-800 hover:bg-gray-700 disabled:bg-gray-800 disabled:cursor-not-allowed rounded-lg transition-colors text-gray-400 hover:text-white group"
+                                className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-neutral-800 hover:bg-neutral-700 disabled:bg-neutral-800 disabled:cursor-not-allowed rounded-lg transition-colors text-neutral-400 hover:text-white group"
                             >
                                 <Plus
                                     size={18}
@@ -295,10 +295,10 @@ export function MultiCam({defaultActiveSequence}: Props) {
 
             {isSyncing && (
                 <div className="fixed inset-0 bg-black/50 flex items-center justify-center">
-                    <div className="bg-gray-800 p-6 rounded-lg shadow-xl">
+                    <div className="bg-neutral-800 p-6 rounded-lg shadow-xl">
                         <div
                             className="animate-spin w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full mb-4 mx-auto"></div>
-                        <p className="text-center text-gray-300">Syncing with Premiere...</p>
+                        <p className="text-center text-neutral-300">Syncing with Premiere...</p>
                     </div>
                 </div>
             )}

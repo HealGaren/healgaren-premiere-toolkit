@@ -18,15 +18,15 @@ export const SequenceSettings: React.FC<Props> = ({
   const [isExpanded, setIsExpanded] = useState(true);
 
   return (
-    <div className="bg-gray-800 rounded-lg mb-6">
+    <div className="bg-neutral-800 rounded-lg mb-6">
       <button
         onClick={() => setIsExpanded(!isExpanded)}
-        className="w-full px-4 py-3 flex items-center gap-2 hover:bg-gray-700/50 transition-colors rounded-lg"
+        className="w-full px-4 py-3 flex items-center gap-2 hover:bg-neutral-700/50 transition-colors rounded-lg"
       >
         {isExpanded ? (
-          <ChevronDown size={16} className="text-gray-400" />
+          <ChevronDown size={16} className="text-neutral-400" />
         ) : (
-          <ChevronRight size={16} className="text-gray-400" />
+          <ChevronRight size={16} className="text-neutral-400" />
         )}
         <span className="font-medium">시퀸스 설정</span>
       </button>
@@ -36,17 +36,17 @@ export const SequenceSettings: React.FC<Props> = ({
           <div className="space-y-3">
             <div className="flex items-center gap-4">
               <div className="flex-1">
-                <div className="text-sm text-gray-400 mb-1">활성 시퀸스</div>
+                <div className="text-sm text-neutral-400 mb-1">활성 시퀸스</div>
                 <div className="text-sm">
                   {activeSequence ? (
                     <>
                       <span className="font-medium">{activeSequence.name}</span>
-                      <span className="text-gray-400 ml-2">
+                      <span className="text-neutral-400 ml-2">
                         ({activeSequence.videoFrameWidth}×{activeSequence.videoFrameHeight}, {activeSequence.videoFrameRateFormatted}fps)
                       </span>
                     </>
                   ) : (
-                    <span className="text-gray-500">선택된 시퀸스 없음</span>
+                    <span className="text-neutral-500">선택된 시퀸스 없음</span>
                   )}
                 </div>
               </div>
@@ -63,7 +63,7 @@ export const SequenceSettings: React.FC<Props> = ({
 
             <div className="flex items-center gap-4">
               <div className="flex-1">
-                <div className="text-sm text-gray-400 mb-1">메인 시퀸스</div>
+                <div className="text-sm text-neutral-400 mb-1">메인 시퀸스</div>
                 <div className="text-sm">
                   {mainSequenceId ? (
                     <span className="font-medium">
@@ -72,7 +72,7 @@ export const SequenceSettings: React.FC<Props> = ({
                         : mainSequenceId}
                     </span>
                   ) : (
-                    <span className="text-gray-500">지정된 메인 시퀸스 없음</span>
+                    <span className="text-neutral-500">지정된 메인 시퀸스 없음</span>
                   )}
                 </div>
               </div>

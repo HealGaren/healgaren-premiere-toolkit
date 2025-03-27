@@ -40,13 +40,13 @@ export const CameraHeader: React.FC<Props> = ({
                             type="text"
                             value={editedName}
                             onChange={(e) => setEditedName(e.target.value)}
-                            className="flex-1 px-2 py-1 bg-gray-700 text-white rounded"
+                            className="flex-1 px-2 py-1 bg-neutral-700 text-white rounded"
                             autoFocus
                         />
                         <div className="flex items-center gap-1">
                             <button
                                 type="submit"
-                                className="p-1 hover:bg-gray-600 rounded transition-colors"
+                                className="p-1 hover:bg-neutral-600 rounded transition-colors"
                             >
                                 <Check size={16} />
                             </button>
@@ -56,7 +56,7 @@ export const CameraHeader: React.FC<Props> = ({
                                     setEditedName(name);
                                     setIsEditing(false);
                                 }}
-                                className="p-1 hover:bg-gray-600 rounded transition-colors"
+                                className="p-1 hover:bg-neutral-600 rounded transition-colors"
                             >
                                 <X size={16} />
                             </button>
@@ -68,13 +68,13 @@ export const CameraHeader: React.FC<Props> = ({
                         <div className="flex items-center gap-1 ml-2 flex-shrink-0">
                             <button
                                 onClick={() => setIsEditing(true)}
-                                className="p-1 hover:bg-gray-600 rounded transition-colors"
+                                className="p-1 hover:bg-neutral-600 rounded transition-colors"
                             >
                                 <Pencil size={16} />
                             </button>
                             <button
                                 onClick={onDelete}
-                                className="p-1 hover:bg-gray-600 rounded transition-colors text-red-400 hover:text-red-300"
+                                className="p-1 hover:bg-neutral-600 rounded transition-colors text-red-400 hover:text-red-300"
                             >
                                 <Trash2 size={16} />
                             </button>
@@ -86,24 +86,24 @@ export const CameraHeader: React.FC<Props> = ({
             {isExpanded && (
                 <div className="flex justify-end items-center gap-4 text-sm">
                     <div className="flex items-center gap-1.5">
-                        <label className="text-gray-400">Track</label>
+                        <label className="text-neutral-400">Track</label>
                         <input
                             type="number"
                             value={trackNumber}
                             onChange={(e) => onTrackNumberChange(Number(e.target.value))}
-                            className="w-12 px-1.5 py-0.5 bg-gray-700 text-white rounded text-right"
+                            className="w-12 px-1.5 py-0.5 bg-neutral-700 text-white rounded text-right"
                             min="0"
                         />
                     </div>
                     <div className="flex items-center gap-1.5">
-                        <label className="text-gray-400">Offset</label>
+                        <label className="text-neutral-400">Offset</label>
                         <input
                             type="number"
                             value={offset}
                             onChange={(e) => onOffsetChange(Number(e.target.value))}
-                            className="w-16 px-1.5 py-0.5 bg-gray-700 text-white rounded text-right"
+                            className="w-16 px-1.5 py-0.5 bg-neutral-700 text-white rounded text-right"
                         />
-                        <span className="text-gray-400">s</span>
+                        <span className="text-neutral-400">s</span>
                     </div>
                 </div>
             )}
