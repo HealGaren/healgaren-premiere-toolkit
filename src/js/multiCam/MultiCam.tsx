@@ -9,9 +9,8 @@ import {useCameras} from './hooks/useCameras';
 import {useInitialState} from './hooks/useInitialState';
 import {useAutoScroll} from './hooks/useAutoScroll';
 import {syncFromPremiere, syncToPremiere} from './api';
-import {saveState, clearAppState} from './utils/storage';
+import {saveState, clearState} from './utils/storage';
 import {SequenceVO} from "../../shared/vo";
-import {VideoFile} from "./types";
 
 interface Props {
     defaultActiveSequence: SequenceVO | null;
@@ -186,7 +185,7 @@ export function MultiCam({defaultActiveSequence}: Props) {
         }
 
         try {
-            await clearAppState();
+            await clearState();
             setCameras([]);
             setMainSequenceId(undefined);
             window.location.reload();

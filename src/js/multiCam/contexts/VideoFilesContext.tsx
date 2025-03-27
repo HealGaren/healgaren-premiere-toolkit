@@ -6,7 +6,7 @@ interface VideoFilesContextType {
   videoFiles: { [nodeId: string]: VideoFile };
   setVideoFiles: React.Dispatch<React.SetStateAction<{ [nodeId: string]: VideoFile }>>;
   isLoading: boolean;
-  loadVideoFiles: (cameraNames?: string[]) => Promise<{ [nodeId: string]: VideoFile }>;
+  loadVideoFiles: (mainSequenceId: string, cameraNums: number[]) => Promise<{ [nodeId: string]: VideoFile }>;
 }
 
 const VideoFilesContext = createContext<VideoFilesContextType | null>(null);
@@ -15,12 +15,20 @@ export const VideoFilesProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const [videoFiles, setVideoFiles] = useState<{ [nodeId: string]: VideoFile }>({});
   const [isLoading, setIsLoading] = useState(false);
 
-  const loadVideoFiles = useCallback(async (cameraNames?: string[]) => {
+  const loadVideoFiles = useCallback(async (mainSequenceId: string, cameraNums: number[]) => {
     setIsLoading(true);
     try {
-      const files = await readVideos(cameraNames);
-      setVideoFiles(prev => ({ ...prev, ...files }));
-      return files;
+      const result = await readVideos(mainSequenceId, cameraNums);
+      if (!result.success) {
+        console.error(result.error);
+        return {};
+      }
+      const newVideoRecord = result.videos.reduce((acc, video) => {
+        acc[video.trackItem.nodeId] = video;
+        return acc;
+      }, {} as Record<string, VideoFile>);
+      setVideoFiles(prev => ({ ...prev, ...newVideoRecord }));
+      return newVideoRecord;
     } finally {
       setIsLoading(false);
     }

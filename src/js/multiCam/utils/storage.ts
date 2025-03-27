@@ -1,5 +1,5 @@
 import { AppState, Camera } from '../types';
-import { saveAppState, loadAppState } from '../api';
+import {saveAppState, loadAppState, clearAppState} from '../api';
 
 export const saveState = async (cameras: Camera[], mainSequenceId?: string) => {
   const state: AppState = { 
@@ -14,8 +14,6 @@ export const loadState = async (): Promise<AppState | null> => {
   return await loadAppState();
 };
 
-export const clearAppState = async (): Promise<void> => {
-  localStorage.removeItem('premiere-sync-user-data');
-  localStorage.removeItem('premiere-sync-video-files');
-  localStorage.removeItem('premiere-sync-last-node-id');
+export const clearState = async (): Promise<void> => {
+  return await clearAppState();
 };

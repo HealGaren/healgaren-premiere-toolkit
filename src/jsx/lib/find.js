@@ -1,0 +1,1 @@
+Array.prototype.find||(Array.prototype.find=function(t){if(this===null)throw TypeError("Array.prototype.find called on null or undefined");if("function"!=typeof t)throw TypeError("predicate must be a function");for(var n,o=Object(this),i=o.length>>>0,r=arguments[1],e=0;e<i;e++)if(n=o[e],t.call(r,n,e,o))return n});

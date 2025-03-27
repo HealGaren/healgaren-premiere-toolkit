@@ -39,7 +39,9 @@ export interface VideoFileUIState {
   premiereSelected: boolean;
 }
 
-export interface ImportVideoFilesResponse {
-  success: boolean;
+export type ImportVideoFilesResponse = {
+  success: false
+} | {
+  success: true;
   videos: VideoFile[];
 }

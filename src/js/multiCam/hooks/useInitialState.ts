@@ -15,8 +15,12 @@ export const useInitialState = (
         const savedState = await loadState();
         if (savedState) {
           // Load video files first
-          const cameraNames = savedState.cameras.map(camera => camera.name);
-          const videoFiles = await loadVideoFiles(cameraNames);
+          const cameraNums = savedState.cameras.map(camera => camera.trackNumber);
+          const mainSequenceId = savedState.mainSequenceId;
+          if (!mainSequenceId) {
+            throw new Error('Main sequence ID not found in saved state');
+          }
+          const videoFiles = await loadVideoFiles(mainSequenceId, cameraNums);
           
           // Set video files
           setVideoFiles(videoFiles);

@@ -103,3 +103,22 @@ export function insertClipWithCreateDate(project: Project, sequenceId: string, t
         };
     });
 }
+
+function flatMap<T, U>(array: T[], callback: (value: T, index: number, array: T[]) => U[]): U[] {
+    return array.reduce<U[]>((acc, value, index) => {
+        acc.push(...callback(value, index, array));
+        return acc;
+    }, []);
+}
+
+export function readVideoClips(project: Project, sequenceId: string, cameraNums: number[]) {
+    const sequence = getSequence(project, sequenceId);
+    if (!sequence) {
+        throw new Error("Sequence not found");
+    }
+
+    return flatMap(cameraNums, cameraNum => {
+        const cameraTrackClips = createArray(sequence.videoTracks[cameraNum].clips, 'numItems');
+        return cameraTrackClips.map(trackItem => ({projectItem: trackItem.projectItem, trackItem}))
+    });
+}
