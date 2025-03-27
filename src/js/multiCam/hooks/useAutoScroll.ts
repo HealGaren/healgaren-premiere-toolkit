@@ -19,26 +19,22 @@ export const useAutoScroll = (selectedTrackItems: TrackItemVO[]) => {
       return;
     }
 
-    const container = containerRef.current;
-    if (!container) return;
-
     // Find the element with the matching nodeId
-    const element = container.querySelector(`[data-node-id="${selectedItem.nodeId}"]`);
+    const element = document.querySelector(`[data-node-id="${selectedItem.nodeId}"]`);
     if (!element) return;
 
-    // Calculate the scroll position to center the element
-    const containerRect = container.getBoundingClientRect();
+    // Calculate the scroll position to center the element in the viewport
     const elementRect = element.getBoundingClientRect();
-    
-    const scrollTop = container.scrollTop + (
-      elementRect.top - 
-      containerRect.top - 
-      (containerRect.height / 2) + 
-      (elementRect.height / 2)
+    const viewportHeight = window.innerHeight;
+
+    const scrollTop = window.scrollY + (
+        elementRect.top -
+        (viewportHeight / 2) +
+        (elementRect.height / 2)
     );
 
     // Smooth scroll to the target position
-    container.scrollTo({
+    window.scrollTo({
       top: scrollTop,
       behavior: 'smooth'
     });
