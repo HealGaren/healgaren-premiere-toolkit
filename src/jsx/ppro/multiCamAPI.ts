@@ -31,3 +31,7 @@ export function loadAppState(): unknown {
 export function clearAppState() {
     writeJSONToXMPMeta(app.project.rootItem.children[0], 'appState', null);
 }
+
+export function openSequence(sequenceId: string) {
+    app.project.openSequence(sequenceId);
+}

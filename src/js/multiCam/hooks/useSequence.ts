@@ -40,13 +40,7 @@ export const useSequence = (defaultActiveSequence: SequenceVO | null) => {
 
   const handleOpenMainSequence = async () => {
     if (!mainSequenceId) return;
-    
-    setIsSyncing(true);
-    try {
-      await openSequence(mainSequenceId);
-    } finally {
-      setIsSyncing(false);
-    }
+    await openSequence(mainSequenceId);
   };
 
   return {
