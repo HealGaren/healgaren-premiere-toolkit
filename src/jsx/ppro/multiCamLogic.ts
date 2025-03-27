@@ -122,3 +122,18 @@ export function readVideoClips(project: Project, sequenceId: string, cameraNums:
         return cameraTrackClips.map(trackItem => ({projectItem: trackItem.projectItem, trackItem}))
     });
 }
+
+export function readSequenceTrackFirstClipOffset(project: Project, sequenceId: string, trackNum: number) {
+    const sequence = getSequence(project, sequenceId);
+    if (!sequence) {
+        throw new Error("Sequence not found");
+    }
+
+    const trackClips = createArray(sequence.videoTracks[trackNum].clips, 'numItems');
+    if (trackClips.length === 0) {
+        return null;
+    }
+
+    const firstClip = trackClips[0];
+    return firstClip.start;
+}

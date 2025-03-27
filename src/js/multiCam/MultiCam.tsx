@@ -253,6 +253,7 @@ export function MultiCam({defaultActiveSequence}: Props) {
                                     camera={camera}
                                     videoFiles={videoFiles}
                                     selectedTrackItems={selectedTrackItems || []}
+                                    mainSequenceId={mainSequenceId}
                                     isLoading={loadingCameraIds.has(camera.id)}
                                     onOffsetChange={(offset) => handleOffsetChange(camera.id, offset)}
                                     onTrackNumberChange={(trackNumber) => handleTrackNumberChange(camera.id, trackNumber)}

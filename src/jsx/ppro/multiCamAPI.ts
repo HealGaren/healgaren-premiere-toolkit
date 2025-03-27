@@ -1,8 +1,13 @@
-import {importVideosWithCameraBin, insertClipWithCreateDate, readVideoClips} from "./multiCamLogic";
-import {createProjectItemVO, createTrackItemVO} from "./createVO";
+import {
+    importVideosWithCameraBin,
+    insertClipWithCreateDate,
+    readSequenceTrackFirstClipOffset,
+    readVideoClips
+} from "./multiCamLogic";
+import {createProjectItemVO, createTimeVO, createTrackItemVO} from "./createVO";
 import {readJSONFromXMPMeta, writeJSONToXMPMeta} from "./customXMP";
 import {ProjectItemVO} from "../../shared/vo/projectItemVO";
-import {TrackItemVO} from "../../shared/vo";
+import {TimeVO, TrackItemVO} from "../../shared/vo";
 
 export function importAndInsertCameraVideos(mainSequenceId: string, cameraName: string, trackNum: number): {success: false} | {success: true, videos: {projectItem: ProjectItemVO, trackItem: TrackItemVO}[]} {
     const project = app.project;
@@ -51,4 +56,11 @@ export function clearAppState() {
 
 export function openSequence(sequenceId: string) {
     app.project.openSequence(sequenceId);
+}
+
+export function readTrackStartOffset(sequenceId: string, trackNumber: number): {startOffset: TimeVO | null} {
+    const offset = readSequenceTrackFirstClipOffset(app.project, sequenceId, trackNumber);
+    return {
+        startOffset: offset ? createTimeVO(offset) : null
+    };
 }

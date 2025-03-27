@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Pencil, Trash2, X, Check } from 'lucide-react';
+import React, {useState} from 'react';
+import {Pencil, Trash2, X, Check, ArrowDownToLine} from 'lucide-react';
 
 interface Props {
     name: string;
@@ -8,6 +8,7 @@ interface Props {
     onTrackNumberChange: (trackNumber: number) => void;
     onDelete: () => void;
     onOffsetChange: (offset: number) => void;
+    onFetchTrackOffset?: () => void;
     offset: number;
     isExpanded: boolean;
 }
@@ -19,6 +20,7 @@ export const CameraHeader: React.FC<Props> = ({
                                                   onTrackNumberChange,
                                                   onDelete,
                                                   onOffsetChange,
+                                                  onFetchTrackOffset,
                                                   offset,
                                                   isExpanded
                                               }) => {
@@ -48,7 +50,7 @@ export const CameraHeader: React.FC<Props> = ({
                                 type="submit"
                                 className="p-1 hover:bg-neutral-600 rounded transition-colors"
                             >
-                                <Check size={16} />
+                                <Check size={16}/>
                             </button>
                             <button
                                 type="button"
@@ -58,7 +60,7 @@ export const CameraHeader: React.FC<Props> = ({
                                 }}
                                 className="p-1 hover:bg-neutral-600 rounded transition-colors"
                             >
-                                <X size={16} />
+                                <X size={16}/>
                             </button>
                         </div>
                     </form>
@@ -70,13 +72,13 @@ export const CameraHeader: React.FC<Props> = ({
                                 onClick={() => setIsEditing(true)}
                                 className="p-1 hover:bg-neutral-600 rounded transition-colors"
                             >
-                                <Pencil size={16} />
+                                <Pencil size={16}/>
                             </button>
                             <button
                                 onClick={onDelete}
                                 className="p-1 hover:bg-neutral-600 rounded transition-colors text-red-400 hover:text-red-300"
                             >
-                                <Trash2 size={16} />
+                                <Trash2 size={16}/>
                             </button>
                         </div>
                     </div>
@@ -97,12 +99,23 @@ export const CameraHeader: React.FC<Props> = ({
                     </div>
                     <div className="flex items-center gap-1.5">
                         <label className="text-neutral-400">Offset</label>
-                        <input
-                            type="number"
-                            value={offset}
-                            onChange={(e) => onOffsetChange(Number(e.target.value))}
-                            className="w-16 px-1.5 py-0.5 bg-neutral-700 text-white rounded text-right"
-                        />
+                        <div className="flex items-center gap-1">
+                            <input
+                                type="number"
+                                value={offset}
+                                onChange={(e) => onOffsetChange(Number(e.target.value))}
+                                className="w-16 px-1.5 py-0.5 bg-neutral-700 text-white rounded text-right"
+                            />
+                            {onFetchTrackOffset && (
+                                <button
+                                    onClick={onFetchTrackOffset}
+                                    className="p-1 hover:bg-neutral-600 rounded transition-colors text-neutral-400 hover:text-white"
+                                    title="트랙의 첫 클립 위치로 오프셋 가져오기"
+                                >
+                                    <ArrowDownToLine size={14}/>
+                                </button>
+                            )}
+                        </div>
                         <span className="text-neutral-400">s</span>
                     </div>
                 </div>
