@@ -1,20 +1,21 @@
 import {SequenceVO, TrackItemVO, TimeVO} from "../../../shared/vo";
 import {ProjectItemVO} from "../../../shared/vo/projectItemVO";
 import {readCreateDateMillsFromXMPMeta} from "../utils/xmp";
+import {getFrameRateFormatted} from "../utils/frameRate";
 
 export function createSequenceVO(sequence: Sequence): SequenceVO {
+    const sequenceSetting = sequence.getSettings();
     return {
         id: sequence.id,
         sequenceID: sequence.sequenceID,
         name: sequence.name,
         videoDisplayFormat: sequence.videoDisplayFormat,
-        videoFrameRate: sequence.videoFrameRate,
-        videoFrameSize: [
-            sequence.videoFrameSize[0],
-            sequence.videoFrameSize[1]
-        ],
-        audioDisplayFormat: sequence.audioDisplayFormat,
-        audioFrameRate: sequence.audioFrameRate,
+        videoFrameRate: createTimeVO(sequenceSetting.videoFrameRate),
+        videoFrameRateFormatted: getFrameRateFormatted(sequenceSetting.videoFrameRate),
+        videoFrameWidth: sequenceSetting.videoFrameWidth,
+        videoFrameHeight: sequenceSetting.videoFrameHeight,
+        audioDisplayFormat: sequenceSetting.audioDisplayFormat,
+        audioSampleRate: createTimeVO(sequenceSetting.audioSampleRate),
     };
 }
 
@@ -57,3 +58,4 @@ export function createProjectItemVO(projectItem: ProjectItem): ProjectItemVO {
         createdAt: readCreateDateMillsFromXMPMeta(projectItem),
     };
 }
+

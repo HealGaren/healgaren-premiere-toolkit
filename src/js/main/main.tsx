@@ -6,7 +6,7 @@ const Main = () => {
     const [message, setMessage] = useState<string>('');
 
     const handleClickMain = () => {
-        evalTS('main').then(result => {
+        evalTS('initialize').then(result => {
             setMessage(`result: ${result}`)
         });
     };

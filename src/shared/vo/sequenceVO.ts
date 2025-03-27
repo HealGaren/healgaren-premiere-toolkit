@@ -1,10 +1,14 @@
+import {TimeVO} from "./timeVO";
+
 export interface SequenceVO {
     id: number;
     sequenceID: string;
     name: string;
     videoDisplayFormat: number;
-    videoFrameRate: number;
-    videoFrameSize: [number, number];
+    videoFrameRate: TimeVO;
+    videoFrameRateFormatted: string;
+    videoFrameWidth: number;
+    videoFrameHeight: number;
     audioDisplayFormat: number;
-    audioFrameRate: number;
+    audioSampleRate: TimeVO;
 }

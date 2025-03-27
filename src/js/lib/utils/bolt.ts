@@ -159,15 +159,9 @@ export const listenTS = <Key extends string & keyof EventTS>(
 ) => {
   const fullEvent = isLocal ? `${ns}.${event}` : event;
   const csi = new CSInterface();
-  // console.log(`listening to ${fullEvent}`);
-  const thisCallback = (e: { data: EventTS[Key] }) => {
+  csi.addEventListener(fullEvent, (e: { data: EventTS[Key] }) => {
     callback(e.data);
-  };
-
-  // remove any existing listeners
-  csi.removeEventListener(fullEvent, thisCallback, null);
-  // add the event listener
-  csi.addEventListener(fullEvent, thisCallback);
+  });
 };
 
 /**

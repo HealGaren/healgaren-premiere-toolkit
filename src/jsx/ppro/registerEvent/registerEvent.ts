@@ -2,8 +2,8 @@ import {createSequenceVO, createTrackItemVO} from "../createVO";
 import {dispatchTS} from "../../utils/utils";
 
 function registerActiveSequenceChanged() {
-    app.bind('onActiveSequenceChanged', () => {
-        dispatchTS('activeSequenceChanged', {
+    app.bind('onSequenceActivated', () => {
+        dispatchTS('sequenceActivated', {
             activeSequence: createSequenceVO(app.project.activeSequence)
         });
     });

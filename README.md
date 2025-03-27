@@ -187,7 +187,7 @@ JSON 2 is included by default, and any external JS libraries added with the incl
 // @include './lib/library.js'
 ```
 
-App-specific code is split into modules for type-safe development by the application's name as seen in the `index.ts`.
+MultiCam-specific code is split into modules for type-safe development by the application's name as seen in the `index.ts`.
 
 ```
 aftereffects >> aeft/aeft.ts
