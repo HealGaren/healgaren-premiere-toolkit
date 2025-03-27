@@ -10,7 +10,7 @@ const MultiCam = () => {
     }
 
     return (
-        <div>
+        <div className="min-h-screen bg-gray-900 text-white p-4">
             <h1 style={{ color: "#ff5b3b" }}>Welcome to Bolt CEP! (MultiCam)</h1>
             <button onClick={handleClick}>open</button>
             <pre>{JSON.stringify(rs, null, 2)}</pre>

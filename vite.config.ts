@@ -81,6 +81,9 @@ export default defineConfig({
     target: "chrome74",
     outDir,
   },
+  optimizeDeps: {
+    exclude: ['lucide-react'],
+  },
 });
 
 // rollup es3 build
