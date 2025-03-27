@@ -43,6 +43,7 @@
     "babel-preset-extendscript": "^1.0.2",
     "core-js": "3",
     "cross-env": "^7.0.3",
+    "extendscript-es5-shim": "^0.3.1",
     "fs-extra": "^10.0.0",
     "rimraf": "^3.0.2",
     "rollup": "^2.68.0",

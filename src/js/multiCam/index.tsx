@@ -1,6 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { initBolt } from "../lib/utils/bolt";
+import {initBolt, listenTS} from "../lib/utils/bolt";
 
 
 import MultiCam from "./MultiCam";

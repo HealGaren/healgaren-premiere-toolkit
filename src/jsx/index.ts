@@ -1,4 +1,5 @@
 // @include './lib/json2.js'
+// @include './lib/extendscript-es5-shim.js'
 
 import { ns } from "../shared/shared";
 

@@ -1,28 +1,13 @@
+import {createXMPMeta, registerXMPNamespace} from "../utils/xmp";
+
 const customNamespaceURI = "https://ns.healgaren.com/ppro-toolkit/1.0/";
 const customNamespacePrefix = "hgPProToolkit";
 
 function init() {
-    if (ExternalObject.AdobeXMPScript == undefined) {
-        ExternalObject.AdobeXMPScript = new ExternalObject("lib:AdobeXMPScript");
-    }
-    if (XMPMeta == undefined) {
-        throw new Error("XMPMeta is not defined");
-    }
-    (XMPMeta as unknown as { registerNamespace: (namespaceURI: string, prefix: string) => string })
-        .registerNamespace(customNamespaceURI, customNamespacePrefix);
+    registerXMPNamespace(customNamespaceURI, customNamespacePrefix);
 }
 
-function createXMPMeta(value?: string | number[]): XMPMetaInstance {
-    if (value === undefined) {
-        return new (XMPMeta!!)();
-    }
-    if (typeof value === "string") {
-        return new (XMPMeta!!)(value);
-    }
-    return new (XMPMeta!!)(value);
-}
-
-export function writeMultipleJSONToXMPMeta(projectItem: ProjectItem, entries: { key: string, value: object }[]) {
+export function writeMultipleJSONToXMPMeta(projectItem: ProjectItem, entries: { key: string, value: unknown }[]) {
     const xmp = createXMPMeta(projectItem.getXMPMetadata());
     entries.map(({key, value}) => {
         const valueJSON = JSON.stringify(value);
@@ -31,7 +16,7 @@ export function writeMultipleJSONToXMPMeta(projectItem: ProjectItem, entries: { 
     return projectItem.setXMPMetadata(xmp.serialize());
 }
 
-export function writeJSONToXMPMeta(projectItem: ProjectItem, key: string, value: object) {
+export function writeJSONToXMPMeta(projectItem: ProjectItem, key: string, value: unknown) {
     return writeMultipleJSONToXMPMeta(projectItem, [{key, value}]);
 }
 
@@ -43,7 +28,7 @@ function safeGetXMPProperty(xmp: XMPMetaInstance, customNamespaceURI: string, ke
     return property.value;
 }
 
-export function readJSONFromXMPMeta<T extends object>(projectItem: ProjectItem, key: string) {
+export function readJSONFromXMPMeta<T>(projectItem: ProjectItem, key: string) {
     const xmp = createXMPMeta(projectItem.getXMPMetadata());
     const valueJSON = safeGetXMPProperty(xmp, customNamespaceURI, key);
     if (valueJSON === undefined) {

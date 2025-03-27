@@ -1,9 +1,13 @@
+import {SequenceVO, TrackItemVO} from "./vo";
+
 /**
  * @description Declare event types for listening with listenTS() and dispatching with dispatchTS()
  */
 export type EventTS = {
-  myCustomEvent: {
-    oneValue: string;
-    anotherValue: number;
-  };
+  activeSequenceChanged: {
+    activeSequence: SequenceVO;
+  }
+  activeSequenceSelectionChanged: {
+    selection: TrackItemVO[];
+  }
 };

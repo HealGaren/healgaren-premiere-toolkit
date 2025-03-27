@@ -2328,6 +2328,11 @@ esutils@^2.0.2:
   resolved "https://registry.yarnpkg.com/esutils/-/esutils-2.0.3.tgz#74d2eb4de0b8da1293711910d50775b9b710ef64"
   integrity sha512-kVscqXk4OCp68SZ0dkgEKVi6/8ij300KBWTJq32P/dYeWTSwK41WyTxalN1eRmA5Z9UU/LX9D7FWSmV9SAYx6g==
 
+extendscript-es5-shim@^0.3.1:
+  version "0.3.1"
+  resolved "https://registry.yarnpkg.com/extendscript-es5-shim/-/extendscript-es5-shim-0.3.1.tgz#6e0e6bbdfb17b7c4723f76bbc5d8e22e4fbb4ed5"
+  integrity sha512-mCnq5G1xe+jHG2ob6Qt5kEqACNAsje7ppYTLethSAlWTZ+zRgOlNFsRkkVcgKw5xJJsM4iE70jHMhn1iD0xa6Q==
+
 fast-glob@3.3.2:
   version "3.3.2"
   resolved "https://registry.yarnpkg.com/fast-glob/-/fast-glob-3.3.2.tgz#a904501e57cfdd2ffcded45e99a54fef55e46129"

@@ -4,6 +4,46 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>HealGaren's Premiere Toolkit (MultiCam)</title>
+    <style>
+      html {
+        --color-background: #1e1e1e;
+        --color-text: #f0f0f0;
+        --color-scrollbar: #1e1e1e;
+        --color-scrollbar-thumb: #4a4a4a;
+        --color-scrollbar-thumb-hover: #6a6a6a;
+        --width-scrollbar-track: 10px;
+        --radius-scrollbar-thumb: 5px;
+      }
+      #app::-webkit-scrollbar {
+        display: block;
+      }
+      body::-webkit-scrollbar {
+        width: 8px;
+      }
+      ::-webkit-scrollbar {
+        background-color: var(--color-scrollbar);
+        width: var(--width-scrollbar-track);
+      }
+      ::-webkit-scrollbar-thumb {
+        width: var(--width-scrollbar-track);
+        background: var(--color-scrollbar-thumb);
+        border-radius: var(--radius-scrollbar-thumb);
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: var(--color-scrollbar-thumb-hover);
+      }
+      ::-webkit-scrollbar-resizer {
+        display: none;
+        width: 0px;
+        background-color: transparent;
+      }
+      ::-webkit-scrollbar-button {
+        height: 0px;
+      }
+      ::-webkit-scrollbar-corner {
+        display: none;
+      }
+    </style>
   </head>
   <body>
     <div id="root"></div>
