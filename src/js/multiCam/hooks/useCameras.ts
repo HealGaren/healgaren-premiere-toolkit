@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Camera, VideoFileUIState } from '../types';
-import { createVideoFromTrackItem } from '../api/files';
+import { createVideoFromTrackItem } from '../api';
 import { saveState } from '../utils/storage';
 import { useVideoFiles } from '../contexts/VideoFilesContext';
 import { useCameraOperations } from './useCameraOperations';

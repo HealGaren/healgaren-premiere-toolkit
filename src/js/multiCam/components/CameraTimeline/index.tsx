@@ -26,7 +26,7 @@ interface Props {
     onFileSelect: (nodeId: string) => void;
     onImportFiles: () => void;
     onAddSelectedClips: () => void;
-    selections: { [nodeId: string]: { selected: boolean; premiereSelected: boolean } };
+    selections: { [nodeId: string]: { selected: boolean } };
 }
 
 export const CameraTimeline: React.FC<Props> = ({
@@ -67,6 +67,13 @@ export const CameraTimeline: React.FC<Props> = ({
         }
     };
 
+    function isPremiereSelected(nodeId: string) {
+        if (selectedTrackItems.length === 0) {
+            return false;
+        }
+        return selectedTrackItems.some(item => item.nodeId === nodeId);
+    }
+
     return (
         <div className="mb-6 bg-neutral-800 rounded-lg">
             <div className="flex items-start">
@@ -104,7 +111,7 @@ export const CameraTimeline: React.FC<Props> = ({
                         <div className="text-sm text-neutral-400">
                             <div className="flex items-center gap-4">
                                 <span>Track {camera.trackNumber}</span>
-                                <span>Offset {camera.offset}s</span>
+                                <span>Offset {camera.offset.toFixed(3)}s</span>
                                 <span>{camera.files.length} clips</span>
                                 <span>{Object.keys(camera.groups).length} groups</span>
                             </div>
@@ -144,7 +151,7 @@ export const CameraTimeline: React.FC<Props> = ({
                             <>
                                 {timelineClips.map(clip => (
                                     <div key={clip.file.trackItem.nodeId}>
-                                        {!clip.userData.groupId && <TimeGap gap={clip.gap}/>}
+                                        {clip.gap > 0 && clip.showGap && <TimeGap gap={clip.gap}/>}
                                         <VideoClip
                                             file={clip.file}
                                             userData={clip.userData}
@@ -165,7 +172,7 @@ export const CameraTimeline: React.FC<Props> = ({
                                             adjustedStartTime={clip.adjustedStartTime}
                                             adjustedEndTime={clip.adjustedEndTime}
                                             isSelected={selections[clip.file.trackItem.nodeId]?.selected || false}
-                                            isPremiereSelected={selections[clip.file.trackItem.nodeId]?.premiereSelected || false}
+                                            isPremiereSelected={isPremiereSelected(clip.file.trackItem.nodeId)}
                                         />
                                     </div>
                                 ))}

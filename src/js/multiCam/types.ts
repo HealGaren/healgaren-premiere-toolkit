@@ -36,7 +36,6 @@ export interface AppState {
 
 export interface VideoFileUIState {
   selected: boolean;
-  premiereSelected: boolean;
 }
 
 export type ImportVideoFilesResponse = {

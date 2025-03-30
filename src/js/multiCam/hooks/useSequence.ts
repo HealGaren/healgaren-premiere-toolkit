@@ -18,7 +18,7 @@ export const useSequence = (defaultActiveSequence: SequenceVO | null) => {
 
     // Listen for selection changes
     listenTS('activeSequenceSelectionChanged', ({ selection }) => {
-      setSelectedTrackItems(selection);
+      setSelectedTrackItems(selection.filter(item => item.mediaType === 'Video'));
     });
 
     return () => {
