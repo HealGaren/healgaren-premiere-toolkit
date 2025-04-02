@@ -31,7 +31,10 @@ export const useTimelineCalculations = (
 
     camera.files.forEach((file, index) => {
       const videoFile = videoFiles[file.nodeId];
-      if (!videoFile) return null;
+      if (!videoFile) {
+        console.error(file);
+        throw new Error(`Video file not found for nodeId: ${file.nodeId}`);
+      }
 
       const createdDeltaTime = videoFile.projectItem.createdAt - firstFileTime;
       const createdDeltaFrame = convertToFrame(createdDeltaTime / 1000, mainSequence.videoFrameRate.seconds);
@@ -43,7 +46,7 @@ export const useTimelineCalculations = (
       let gapFrame = 0;
       let showGap = false;
 
-      let isFirstInGroup = false;
+      let isFirstInGroup = true;
 
       const clipGroup = (() => {
         const {groupId} = file.userData;
@@ -54,10 +57,28 @@ export const useTimelineCalculations = (
       })();
 
       const groupOffset = (clipGroup?.offsetFrame ?? 0);
-      const adjustedStartFrame = cameraStartFrame + file.userData.clipOffsetFrame;
+
+      // Calculate start frame based on continuous mode
+      let adjustedStartFrame = cameraStartFrame;
+      if (clipGroup?.continuous) {
+        // In continuous mode, calculate position based on previous clips in the group
+        if (index > 0) {
+          const prevFile = camera.files[index - 1];
+          if (prevFile.userData.groupId === file.userData.groupId) {
+            // If previous clip is in the same group, position this clip right after it
+            const prevClip = timelineClipResults[index - 1];
+            adjustedStartFrame = prevClip.adjustedEndFrame;
+          }
+        }
+        adjustedStartFrame += groupOffset;
+      } else {
+        // In non-continuous mode, use normal offset calculation
+        adjustedStartFrame += groupOffset + file.userData.clipOffsetFrame;
+      }
 
       if (index >= 1) {
         const previousFile = camera.files[index - 1];
+        debugger;
         const previousEndFrame = timelineClipResults[index - 1].adjustedEndFrame;
 
         gapFrame = adjustedStartFrame - previousEndFrame;

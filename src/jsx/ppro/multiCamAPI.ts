@@ -1,7 +1,7 @@
 import {
     getSequence,
-    importVideosWithCameraBin,
-    overwriteClipWithCreateDate,
+    importVideosWithCameraBin, overwriteClipWithCreateDate,
+    overwriteClipWithGap,
     readSequenceTrackFirstClipOffset,
     readVideoClips, syncAllClipStartTimeInCamera
 } from "./multiCamLogic";
@@ -9,7 +9,6 @@ import {createProjectItemVO, createSequenceVO, createTimeVO, createTrackItemVO} 
 import {readJSONFromXMPMeta, writeJSONToXMPMeta} from "./customXMP";
 import {ProjectItemVO} from "../../shared/vo/projectItemVO";
 import {TimeVO, TrackItemVO} from "../../shared/vo";
-import {AppState, Camera} from "../../js/multiCam/types";
 import {NormalizedTrackItemStartTimeInCamera} from "../../shared/vo/normalizedTrackItemOffsetVO";
 
 export function importAndInsertCameraVideos(mainSequenceId: string, cameraName: string, trackNum: number): {success: false} | {success: true, videos: {projectItem: ProjectItemVO, trackItem: TrackItemVO}[]} {
@@ -24,7 +23,7 @@ export function importAndInsertCameraVideos(mainSequenceId: string, cameraName: 
         return {success: false};
     }
 
-    const videos = overwriteClipWithCreateDate(sequence, trackNum, importVideoResult.projectItems);
+    const videos = overwriteClipWithCreateDate(sequence, trackNum, importVideoResult.projectItems, 5);
 
     return {
         success: true,

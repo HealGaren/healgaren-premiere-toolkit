@@ -68,7 +68,7 @@ export function importVideosWithCameraBin(project: Project, cameraName: string) 
     return importVideos(project, targetBin);
 }
 
-export function overwriteClipWithCreateDate(sequence: Sequence, trackNum: number, videoProjectItems: ProjectItem[]) {
+export function overwriteClipWithCreateDate(sequence: Sequence, trackNum: number, videoProjectItems: ProjectItem[], gapSeconds: number = 0) {
     const videoProjectItemsWithCreateDate = videoProjectItems.map(item => {
         const createDate = readCreateDateMillsFromXMPMeta(item);
         if (createDate === null) {
@@ -83,12 +83,37 @@ export function overwriteClipWithCreateDate(sequence: Sequence, trackNum: number
         return (a.createDate ?? 0) - (b.createDate ?? 0);
     });
 
+    let sumOfGap = 0;
+
     const firstVideoCreateDate = videoProjectItemsWithCreateDate[0].createDate;
     videoProjectItemsWithCreateDate.forEach(videoProjectItem => {
         const deltaSeconds = (videoProjectItem.createDate - firstVideoCreateDate) / 1000;
         // @ts-ignore
-        sequence.overwriteClip(videoProjectItem.projectItem, secondsAsTime(deltaSeconds), trackNum, trackNum);
+        sequence.overwriteClip(videoProjectItem.projectItem, secondsAsTime(deltaSeconds) + sumOfGap, trackNum, trackNum);
+        sumOfGap += gapSeconds;
     });
+
+    const clips = createArray(sequence.videoTracks[trackNum].clips, 'numItems');
+    return videoProjectItems.map(projectItem => {
+        const trackItem = clips.find(clip => clip.projectItem.nodeId === projectItem.nodeId);
+        if (!trackItem) {
+            throw new Error("Track item not found");
+        }
+        return {
+            projectItem,
+            trackItem
+        };
+    });
+}
+
+
+export function overwriteClipWithGap(sequence: Sequence, trackNum: number, videoProjectItems: ProjectItem[]) {
+    let nextVideoStartTime = 0;
+    videoProjectItems.forEach((projectItem => {
+        // @ts-ignore
+        sequence.overwriteClip(projectItem, nextVideoStartTime, trackNum, trackNum);
+        nextVideoStartTime += projectItem.getOutPoint().seconds + 10;
+    }));
 
     const clips = createArray(sequence.videoTracks[trackNum].clips, 'numItems');
     return videoProjectItems.map(projectItem => {

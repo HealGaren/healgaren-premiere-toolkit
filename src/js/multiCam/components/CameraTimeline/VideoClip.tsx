@@ -1,7 +1,7 @@
 import React from 'react';
 import {VideoFile, VideoGroup, CameraVideoFile} from '../../types';
 import {formatFrameTime, formatTime} from '../../utils/time';
-import {Unlink, AlertTriangle, Scissors} from 'lucide-react';
+import {Unlink, AlertTriangle, Scissors, Link} from 'lucide-react';
 import {SequenceVO} from "../../../../shared/vo";
 
 interface Props {
@@ -14,6 +14,7 @@ interface Props {
     onClipOffsetFrameChange: (nodeId: string, offsetFrame: number) => void;
     onGroupOffsetFrameChange?: (offsetFrame: number) => void;
     onGroupDelete?: () => void;
+    onGroupContinuousChange?: (continuous: boolean) => void;
     adjustedStartFrame: number;
     adjustedEndFrame: number;
     overlappingClips?: Array<{
@@ -35,6 +36,7 @@ export const VideoClip: React.FC<Props> = ({
                                                onClipOffsetFrameChange,
                                                onGroupOffsetFrameChange,
                                                onGroupDelete,
+                                               onGroupContinuousChange,
                                                adjustedStartFrame,
                                                adjustedEndFrame,
                                                overlappingClips,
@@ -73,8 +75,16 @@ export const VideoClip: React.FC<Props> = ({
                         onChange={(e) => onGroupOffsetFrameChange?.(Number(e.target.value))}
                         className="w-24 px-2 py-1 bg-neutral-700 text-white rounded text-right text-xs"
                         step="1"
+                        disabled={group.continuous}
                     />
                     <span className="text-neutral-400">f</span>
+                    <button
+                        onClick={() => onGroupContinuousChange?.(!group.continuous)}
+                        className={`p-1 hover:bg-neutral-600 rounded transition-colors ${group.continuous ? 'text-green-500' : 'text-neutral-400'}`}
+                        title={group.continuous ? "Continuous mode enabled" : "Enable continuous mode"}
+                    >
+                        <Link size={12}/>
+                    </button>
                     <button
                         onClick={onGroupDelete}
                         className="p-1 hover:bg-neutral-600 rounded transition-colors"
@@ -113,6 +123,7 @@ export const VideoClip: React.FC<Props> = ({
                         onChange={(e) => onClipOffsetFrameChange(file.trackItem.nodeId, Number(e.target.value))}
                         className="w-24 px-2 py-1 bg-neutral-600 text-white rounded text-right text-xs"
                         step="1"
+                        disabled={group?.continuous}
                     />
                     <span className="text-neutral-400">f</span>
                 </div>

@@ -26,7 +26,8 @@ export const useCameras = (mainSequenceId: string | undefined) => {
   const {
     handleGroupCreate,
     handleGroupDelete,
-    handleGroupOffsetFrameChange
+    handleGroupOffsetFrameChange,
+    handleGroupContinuousChange
   } = useGroupOperations(cameras, setCameras, mainSequenceId);
 
   const handleAddCamera = async () => {
@@ -153,6 +154,7 @@ export const useCameras = (mainSequenceId: string | undefined) => {
     handleFileSelect,
     handleGroupCreate,
     handleGroupDelete,
-    handleGroupOffsetFrameChange
+    handleGroupOffsetFrameChange,
+    handleGroupContinuousChange
   };
 };

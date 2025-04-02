@@ -24,6 +24,7 @@ interface Props {
     onGroupCreate: (files: VideoFile[]) => void;
     onGroupDelete: (groupId: string) => void;
     onGroupOffsetFrameChange: (groupId: string, offsetFrame: number) => void;
+    onGroupContinuousChange: (groupId: string, continuous: boolean) => void;
     onFileSelect: (nodeId: string) => void;
     onImportFiles: () => void;
     onSyncListOfClips: () => void;
@@ -45,6 +46,7 @@ export const CameraTimeline: React.FC<Props> = ({
                                                     onGroupCreate,
                                                     onGroupDelete,
                                                     onGroupOffsetFrameChange,
+                                                    onGroupContinuousChange,
                                                     onFileSelect,
                                                     onImportFiles,
                                                     onSyncListOfClips,
@@ -170,6 +172,11 @@ export const CameraTimeline: React.FC<Props> = ({
                                             onGroupDelete={
                                                 clip.userData.groupId
                                                     ? () => onGroupDelete(clip.userData.groupId!)
+                                                    : undefined
+                                            }
+                                            onGroupContinuousChange={
+                                                clip.userData.groupId
+                                                    ? (continuous) => onGroupContinuousChange(clip.userData.groupId!, continuous)
                                                     : undefined
                                             }
                                             adjustedStartFrame={clip.adjustedStartFrame}

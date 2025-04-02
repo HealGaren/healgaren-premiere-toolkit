@@ -2,7 +2,6 @@ import React from 'react';
 import {CameraTimeline} from './components/CameraTimeline';
 import {CameraSkeleton} from './components/CameraSkeleton';
 import {SequenceSettings} from './components/SequenceSettings';
-import {SelectionToolbar} from './components/SelectionToolbar';
 import {BottomBar} from './components/BottomBar';
 import {Plus, Trash2} from 'lucide-react';
 import {useSequence} from './hooks/useSequence';
@@ -18,6 +17,7 @@ import {
 } from "../../shared/vo/normalizedTrackItemOffsetVO";
 import {Camera} from "./types";
 import {convertToFrame} from "./utils/time";
+import {SelectionToolbar} from "./components/SelectionToolbar";
 
 interface Props {
     defaultActiveSequence: SequenceVO | null;
@@ -57,6 +57,7 @@ export function MultiCam({defaultActiveSequence}: Props) {
         handleGroupCreate,
         handleGroupDelete,
         handleGroupOffsetFrameChange,
+        handleGroupContinuousChange
     } = useCameras(mainSequenceId);
 
     useInitialState(setIsInitialLoading, setCameras, setMainSequenceId);
@@ -184,33 +185,48 @@ export function MultiCam({defaultActiveSequence}: Props) {
             const firstClipProjectItem = videoFiles[firstClip.nodeId].projectItem;
             const firstClipCreatedAt = firstClipProjectItem.createdAt;
 
-            const trackItemStartTimes: NormalizedTrackItemStartTimeVO[] = camera.files.map(file => {
+            const trackItemStartTimes: NormalizedTrackItemStartTimeVO[] = [];
+            let previousEndFrame = 0;
+
+            camera.files.forEach((file, index) => {
                 const videoFile = videoFiles[file.nodeId];
                 if (!videoFile) {
                     throw new Error(`Video file not found for nodeId: ${file.nodeId}`);
                 }
+
                 const clipCreatedAt = videoFile.projectItem.createdAt;
                 const createdDelta = clipCreatedAt - firstClipCreatedAt;
                 const createdDeltaSeconds = createdDelta / 1000;
+                const createdDeltaFrame = convertToFrame(createdDeltaSeconds, mainSequence.videoFrameRate.seconds);
 
-                const clipGroup = (() => {
-                    const {groupId} = file.userData;
-                    if (groupId === undefined) {
-                        return null;
+                const clipGroup = file.userData.groupId ? camera.groups[file.userData.groupId] : null;
+                let startFrame = camera.offsetFrame + createdDeltaFrame;
+
+                if (clipGroup?.continuous) {
+                    // In continuous mode, position clips end-to-end within the group
+                    if (index > 0) {
+                        const prevFile = camera.files[index - 1];
+                        if (prevFile.userData.groupId === file.userData.groupId) {
+                            startFrame = previousEndFrame;
+                        }
                     }
-                    return camera.groups[groupId] ?? null;
-                })();
+                    startFrame += clipGroup.offsetFrame;
+                } else {
+                    // In non-continuous mode, use normal offset calculation
+                    startFrame += (clipGroup?.offsetFrame ?? 0) + file.userData.clipOffsetFrame;
+                }
 
-                const startFrame = convertToFrame(createdDeltaSeconds, mainSequence.videoFrameRate.seconds) + camera.offsetFrame + (clipGroup?.offsetFrame ?? 0) + file.userData.clipOffsetFrame;
                 const startSeconds = startFrame * mainSequence.videoFrameRate.seconds;
-
-                return {
+                trackItemStartTimes.push({
                     trackItemNodeId: videoFile.trackItem.nodeId,
                     startTime: {
                         frames: startFrame,
                         seconds: startSeconds
                     }
-                };
+                });
+
+                // Update previousEndFrame for continuous mode calculations
+                previousEndFrame = startFrame + convertToFrame(videoFile.projectItem.outPoint.seconds, mainSequence.videoFrameRate.seconds);
             });
 
             const trackItemStartTimeRecord: Record<string, NormalizedTrackItemStartTimeVO> = {};
@@ -222,7 +238,7 @@ export function MultiCam({defaultActiveSequence}: Props) {
                 trackItemStartTimeRecord,
                 trackNumber: camera.trackNumber
             };
-        }
+        };
 
         try {
             const trackItemStartTimesOfCameras: NormalizedTrackItemStartTimeInCamera[] = cameras.map(camera => createTrackItemStartTimesOfCamera(camera));
@@ -317,6 +333,7 @@ export function MultiCam({defaultActiveSequence}: Props) {
                                         onGroupCreate={(files) => handleGroupCreate(camera.id, files)}
                                         onGroupDelete={(groupId) => handleGroupDelete(camera.id, groupId)}
                                         onGroupOffsetFrameChange={(groupId, offset) => handleGroupOffsetFrameChange(camera.id, groupId, offset)}
+                                        onGroupContinuousChange={(groupId, continuous) => handleGroupContinuousChange(camera.id, groupId, continuous)}
                                         onImportFiles={() => handleImportFiles(camera.id)}
                                         onSyncListOfClips={() => handleSyncListOfClipsInCamera(camera.id)}
                                         selections={selections}

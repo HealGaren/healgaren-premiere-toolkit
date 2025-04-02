@@ -17,6 +17,7 @@ export interface CameraVideoFile {
 export interface VideoGroup {
   id: string;
   offsetFrame: number;
+  continuous: boolean;
 }
 
 export interface Camera {
