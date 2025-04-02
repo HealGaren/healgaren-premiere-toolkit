@@ -189,9 +189,22 @@ export function MultiCam({defaultActiveSequence}: Props) {
                 const createdDelta = clipCreatedAt - firstClipCreatedAt;
                 const createdDeltaSeconds = createdDelta / 1000;
 
+                const clipGroupOffset = (() => {
+                    const {groupId} = file.userData;
+                    if (groupId === undefined) {
+                        return 0;
+                    }
+                    const group = camera.groups[groupId];
+                    if (!group) {
+                        return 0;
+                    }
+                    const groupOffset = group.offset;
+                    return groupOffset / 1000;
+                })();
+
                 return {
                     trackItemNodeId: videoFile.trackItem.nodeId,
-                    startTimeSeconds: createdDeltaSeconds + camera.offset + file.userData.clipOffset / 1000
+                    startTimeSeconds: createdDeltaSeconds + camera.offset + clipGroupOffset + file.userData.clipOffset / 1000
                 };
             });
 
