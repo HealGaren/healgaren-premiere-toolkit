@@ -1,5 +1,5 @@
 import {ProjectItemVO} from "../../shared/vo/projectItemVO";
-import {TrackItemVO} from "../../shared/vo";
+import {TimeVO, TrackItemVO} from "../../shared/vo";
 
 export interface VideoFile {
   projectItem: ProjectItemVO;
@@ -9,14 +9,14 @@ export interface VideoFile {
 export interface CameraVideoFile {
   nodeId: string;
   userData: {
-    clipOffset: number;
+    clipOffsetFrame: number;
     groupId?: string;
   };
 }
 
 export interface VideoGroup {
   id: string;
-  offset: number; // in milliseconds
+  offsetFrame: number;
 }
 
 export interface Camera {
@@ -24,7 +24,7 @@ export interface Camera {
   name: string;
   trackNumber: number;
   files: CameraVideoFile[];
-  offset: number; // in seconds
+  offsetFrame: number;
   groups: { [key: string]: VideoGroup };
 }
 

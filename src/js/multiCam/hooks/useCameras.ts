@@ -26,7 +26,7 @@ export const useCameras = (mainSequenceId: string | undefined) => {
   const {
     handleGroupCreate,
     handleGroupDelete,
-    handleGroupOffsetChange
+    handleGroupOffsetFrameChange
   } = useGroupOperations(cameras, setCameras, mainSequenceId);
 
   const handleAddCamera = async () => {
@@ -64,7 +64,7 @@ export const useCameras = (mainSequenceId: string | undefined) => {
     const newFiles = unloadedVideos.map(video => ({
       nodeId: video.trackItem.nodeId,
       userData: {
-        clipOffset: 0
+        clipOffsetFrame: 0
       }
     }));
 
@@ -90,9 +90,9 @@ export const useCameras = (mainSequenceId: string | undefined) => {
     }));
   };
 
-  const handleOffsetChange = async (cameraId: string, offset: number) => {
+  const handleOffsetFrameChange = async (cameraId: string, offsetFrame: number) => {
     const updatedCameras = cameras.map(camera => 
-      camera.id === cameraId ? { ...camera, offset } : camera
+      camera.id === cameraId ? { ...camera, offsetFrame } : camera
     );
     setCameras(updatedCameras);
     await saveState(updatedCameras, mainSequenceId);
@@ -106,7 +106,7 @@ export const useCameras = (mainSequenceId: string | undefined) => {
     await saveState(updatedCameras, mainSequenceId);
   };
 
-  const handleClipOffsetChange = async (cameraId: string, nodeId: string, clipOffset: number) => {
+  const handleClipOffsetFrameChange = async (cameraId: string, nodeId: string, clipOffsetFrame: number) => {
     const updatedCameras = cameras.map(camera => {
       if (camera.id !== cameraId) return camera;
 
@@ -114,7 +114,7 @@ export const useCameras = (mainSequenceId: string | undefined) => {
         ...camera,
         files: camera.files.map(file =>
           file.nodeId === nodeId
-            ? { ...file, userData: { ...file.userData, clipOffset } }
+            ? { ...file, userData: { ...file.userData, clipOffsetFrame } }
             : file
         )
       };
@@ -145,14 +145,14 @@ export const useCameras = (mainSequenceId: string | undefined) => {
     handleImportFiles,
     handleSyncListOfClipsInCamera,
     handleSyncListOfClipsInAllCamera,
-    handleOffsetChange,
+    handleOffsetFrameChange,
     handleTrackNumberChange,
-    handleClipOffsetChange,
+    handleClipOffsetFrameChange,
     handleNameChange,
     handleDeleteCamera,
     handleFileSelect,
     handleGroupCreate,
     handleGroupDelete,
-    handleGroupOffsetChange
+    handleGroupOffsetFrameChange
   };
 };

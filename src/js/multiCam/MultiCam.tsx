@@ -16,6 +16,7 @@ import {
     NormalizedTrackItemStartTimeVO
 } from "../../shared/vo/normalizedTrackItemOffsetVO";
 import {Camera} from "./types";
+import {convertToFrame} from "./utils/time";
 
 interface Props {
     defaultActiveSequence: SequenceVO | null;
@@ -26,6 +27,7 @@ export function MultiCam({defaultActiveSequence}: Props) {
         activeSequence,
         selectedTrackItems,
         mainSequenceId,
+        mainSequence,
         isSyncing: isSequenceSyncing,
         setMainSequenceId,
         handleSetMainSequence,
@@ -45,15 +47,15 @@ export function MultiCam({defaultActiveSequence}: Props) {
         handleImportFiles,
         handleSyncListOfClipsInCamera,
         handleSyncListOfClipsInAllCamera,
-        handleOffsetChange,
+        handleOffsetFrameChange,
         handleTrackNumberChange,
-        handleClipOffsetChange,
+        handleClipOffsetFrameChange,
         handleNameChange,
         handleDeleteCamera,
         handleFileSelect,
         handleGroupCreate,
         handleGroupDelete,
-        handleGroupOffsetChange,
+        handleGroupOffsetFrameChange,
     } = useCameras(mainSequenceId);
 
     useInitialState(setIsInitialLoading, setCameras, setMainSequenceId);
@@ -138,37 +140,38 @@ export function MultiCam({defaultActiveSequence}: Props) {
     const handleSyncFromPremiere = async () => {
         if (isSyncing) return;
 
-        try {
-            const offsets = await syncFromPremiere();
-            const updatedCameras = cameras.map(camera => ({
-                ...camera,
-                files: camera.files.map(file => {
-                    const videoFile = videoFiles[file.nodeId];
-                    if (videoFile && offsets[videoFile.trackItem.nodeId] !== undefined) {
-                        return {
-                            ...file,
-                            userData: {
-                                ...file.userData,
-                                clipOffset: offsets[videoFile.trackItem.nodeId]
-                            }
-                        };
-                    }
-                    return file;
-                })
-            }));
-
-            setCameras(updatedCameras);
-            await saveState(updatedCameras, mainSequenceId);
-        } catch (error) {
-            console.error('Error syncing from Premiere:', error);
-        }
+        // try {
+        //     const offsets = await syncFromPremiere();
+        //     const updatedCameras = cameras.map(camera => ({
+        //         ...camera,
+        //         files: camera.files.map(file => {
+        //             const videoFile = videoFiles[file.nodeId];
+        //             if (videoFile && offsets[videoFile.trackItem.nodeId] !== undefined) {
+        //                 return {
+        //                     ...file,
+        //                     userData: {
+        //                         ...file.userData,
+        //                         clipOffset: offsets[videoFile.trackItem.nodeId]
+        //                     }
+        //                 };
+        //             }
+        //             return file;
+        //         })
+        //     }));
+        //
+        //     setCameras(updatedCameras);
+        //     await saveState(updatedCameras, mainSequenceId);
+        // } catch (error) {
+        //     console.error('Error syncing from Premiere:', error);
+        // }
     };
 
     const handleSyncToPremiere = async () => {
         if (isSyncing) return;
         if (!mainSequenceId) return;
+        if (!mainSequence) return;
 
-        function createTrackItemStartTimesOfCamera(camera: Camera): NormalizedTrackItemStartTimeInCamera {
+        const createTrackItemStartTimesOfCamera = (camera: Camera): NormalizedTrackItemStartTimeInCamera => {
             if (camera.files.length === 0) {
                 return {
                     trackItemStartTimeRecord: {},
@@ -189,22 +192,23 @@ export function MultiCam({defaultActiveSequence}: Props) {
                 const createdDelta = clipCreatedAt - firstClipCreatedAt;
                 const createdDeltaSeconds = createdDelta / 1000;
 
-                const clipGroupOffset = (() => {
+                const clipGroup = (() => {
                     const {groupId} = file.userData;
                     if (groupId === undefined) {
-                        return 0;
+                        return null;
                     }
-                    const group = camera.groups[groupId];
-                    if (!group) {
-                        return 0;
-                    }
-                    const groupOffset = group.offset;
-                    return groupOffset / 1000;
+                    return camera.groups[groupId] ?? null;
                 })();
+
+                const startFrame = convertToFrame(createdDeltaSeconds, mainSequence.videoFrameRate.seconds) + camera.offsetFrame + (clipGroup?.offsetFrame ?? 0) + file.userData.clipOffsetFrame;
+                const startSeconds = startFrame * mainSequence.videoFrameRate.seconds;
 
                 return {
                     trackItemNodeId: videoFile.trackItem.nodeId,
-                    startTimeSeconds: createdDeltaSeconds + camera.offset + clipGroupOffset + file.userData.clipOffset / 1000
+                    startTime: {
+                        frames: startFrame,
+                        seconds: startSeconds
+                    }
                 };
             });
 
@@ -303,16 +307,17 @@ export function MultiCam({defaultActiveSequence}: Props) {
                                     videoFiles={videoFiles}
                                     selectedTrackItems={selectedTrackItems || []}
                                     mainSequenceId={mainSequenceId}
+                                    mainSequence={mainSequence}
                                     isLoading={loadingCameraIds.has(camera.id)}
-                                    onOffsetChange={(offset) => handleOffsetChange(camera.id, offset)}
+                                    onOffsetFrameChange={(offset) => handleOffsetFrameChange(camera.id, offset)}
                                     onTrackNumberChange={(trackNumber) => handleTrackNumberChange(camera.id, trackNumber)}
-                                    onClipOffsetChange={(nodeId, offset) => handleClipOffsetChange(camera.id, nodeId, offset)}
+                                    onClipOffsetFrameChange={(nodeId, offset) => handleClipOffsetFrameChange(camera.id, nodeId, offset)}
                                     onNameChange={(name) => handleNameChange(camera.id, name)}
                                     onDelete={() => handleDeleteCamera(camera.id)}
                                     onFileSelect={handleFileSelect}
                                     onGroupCreate={(files) => handleGroupCreate(camera.id, files)}
                                     onGroupDelete={(groupId) => handleGroupDelete(camera.id, groupId)}
-                                    onGroupOffsetChange={(groupId, offset) => handleGroupOffsetChange(camera.id, groupId, offset)}
+                                    onGroupOffsetFrameChange={(groupId, offset) => handleGroupOffsetFrameChange(camera.id, groupId, offset)}
                                     onImportFiles={() => handleImportFiles(camera.id)}
                                     onSyncListOfClips={() => handleSyncListOfClipsInCamera(camera.id)}
                                     selections={selections}

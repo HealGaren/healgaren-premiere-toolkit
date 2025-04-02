@@ -17,7 +17,7 @@ function registerSequenceSelectionChanged() {
     app.bind('onActiveSequenceSelectionChanged', () => {
         dispatchTS('activeSequenceSelectionChanged', {
             selection: app.project.activeSequence.getSelection()
-                .map(it => createTrackItemVO(it))
+                .map(it => createTrackItemVO(app.project.activeSequence, it))
         });
     });
 }

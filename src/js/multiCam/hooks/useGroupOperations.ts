@@ -18,7 +18,7 @@ export const useGroupOperations = (
             file.userData.groupId = groupId;
           }
         });
-        camera.groups[groupId] = { id: groupId, offset: 0 };
+        camera.groups[groupId] = { id: groupId, offsetFrame: 0 };
       }
     });
     
@@ -43,11 +43,11 @@ export const useGroupOperations = (
     await saveState(updatedCameras, mainSequenceId);
   };
 
-  const handleGroupOffsetChange = async (cameraId: string, groupId: string, offset: number) => {
+  const handleGroupOffsetFrameChange = async (cameraId: string, groupId: string, offsetFrame: number) => {
     const updatedCameras = produce(cameras, draft => {
       const camera = draft.find(c => c.id === cameraId);
       if (camera && camera.groups[groupId]) {
-        camera.groups[groupId].offset = offset;
+        camera.groups[groupId].offsetFrame = offsetFrame;
       }
     });
     
@@ -58,6 +58,6 @@ export const useGroupOperations = (
   return {
     handleGroupCreate,
     handleGroupDelete,
-    handleGroupOffsetChange
+    handleGroupOffsetFrameChange
   };
 };

@@ -31,3 +31,23 @@ export function getFrameRateFormatted(frameRate: Time) {
 
     return frameRateMap[frameRate.seconds] || 'Unknown';
 }
+
+export function getFrameCountInSecond(frameRate: Time) {
+    const frameCountMap: { [key: number]: number } = {
+        [FrameRateConst.FRAME_23976.seconds]: 24,
+        [FrameRateConst.FRAME_24.seconds]: 24,
+        [FrameRateConst.FRAME_25.seconds]: 25,
+        [FrameRateConst.FRAME_2997.seconds]: 30,
+        [FrameRateConst.FRAME_30.seconds]: 30,
+        [FrameRateConst.FRAME_50.seconds]: 50,
+        [FrameRateConst.FRAME_5994.seconds]: 60,
+        [FrameRateConst.FRAME_60.seconds]: 60,
+        [FrameRateConst.FRAME_120.seconds]: 120,
+    };
+
+    return frameCountMap[frameRate.seconds];
+}
+
+export function getSecondsByFrames(frames: number, frameRate: Time) {
+    return frameRate.seconds * frames;
+}

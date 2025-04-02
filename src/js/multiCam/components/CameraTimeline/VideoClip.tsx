@@ -1,19 +1,21 @@
 import React from 'react';
 import {VideoFile, VideoGroup, CameraVideoFile} from '../../types';
-import {formatTime} from '../../utils/time';
+import {formatFrameTime, formatTime} from '../../utils/time';
 import {Unlink, AlertTriangle, Scissors} from 'lucide-react';
+import {SequenceVO} from "../../../../shared/vo";
 
 interface Props {
+    sequence: SequenceVO | null;
     file: VideoFile;
     userData: CameraVideoFile['userData'];
     group?: VideoGroup;
     isFirstInGroup: boolean;
     onSelect: () => void;
-    onClipOffsetChange: (nodeId: string, offset: number) => void;
-    onGroupOffsetChange?: (offset: number) => void;
+    onClipOffsetFrameChange: (nodeId: string, offsetFrame: number) => void;
+    onGroupOffsetFrameChange?: (offsetFrame: number) => void;
     onGroupDelete?: () => void;
-    adjustedStartTime: number;
-    adjustedEndTime: number;
+    adjustedStartFrame: number;
+    adjustedEndFrame: number;
     overlappingClips?: Array<{
         nodeId: string;
         name: string;
@@ -24,23 +26,24 @@ interface Props {
 }
 
 export const VideoClip: React.FC<Props> = ({
+                                               sequence,
                                                file,
                                                userData,
                                                group,
                                                isFirstInGroup,
                                                onSelect,
-                                               onClipOffsetChange,
-                                               onGroupOffsetChange,
+                                               onClipOffsetFrameChange,
+                                               onGroupOffsetFrameChange,
                                                onGroupDelete,
-                                               adjustedStartTime,
-                                               adjustedEndTime,
+                                               adjustedStartFrame,
+                                               adjustedEndFrame,
                                                overlappingClips,
                                                isSelected,
                                                isPremiereSelected
                                            }) => {
-    const getOffsetColor = (offset: number) => {
-        if (offset === 0) return '';
-        return offset > 0
+    const getOffsetColor = (offsetFrame: number) => {
+        if (offsetFrame === 0) return '';
+        return offsetFrame > 0
             ? 'text-yellow-500/80'
             : 'text-blue-500/80';
     };
@@ -66,12 +69,12 @@ export const VideoClip: React.FC<Props> = ({
                     <span className="text-green-500">Grouped</span>
                     <input
                         type="number"
-                        value={group.offset}
-                        onChange={(e) => onGroupOffsetChange?.(Number(e.target.value))}
+                        value={group.offsetFrame}
+                        onChange={(e) => onGroupOffsetFrameChange?.(Number(e.target.value))}
                         className="w-24 px-2 py-1 bg-neutral-700 text-white rounded text-right text-xs"
                         step="1"
                     />
-                    <span className="text-neutral-400">ms</span>
+                    <span className="text-neutral-400">f</span>
                     <button
                         onClick={onGroupDelete}
                         className="p-1 hover:bg-neutral-600 rounded transition-colors"
@@ -98,20 +101,20 @@ export const VideoClip: React.FC<Props> = ({
                 <span>{formatTime(file.projectItem.outPoint.seconds)}</span>
             </div>
             <div className="text-xs space-y-1">
-                <div className={getOffsetColor(userData.clipOffset)}>
-                    <div>Start: {formatTime(adjustedStartTime)}</div>
-                    <div>End: {formatTime(adjustedEndTime)}</div>
+                <div className={getOffsetColor(userData.clipOffsetFrame)}>
+                    <div>Start: {sequence ? formatFrameTime(adjustedStartFrame, sequence.videoFrameCountInSecond) : null}</div>
+                    <div>End: {sequence ? formatFrameTime(adjustedEndFrame, sequence.videoFrameCountInSecond) : null}</div>
                 </div>
                 <div className="flex items-center gap-2 mt-2">
                     <label className="text-neutral-400">Clip offset:</label>
                     <input
                         type="number"
-                        value={userData.clipOffset}
-                        onChange={(e) => onClipOffsetChange(file.trackItem.nodeId, Number(e.target.value))}
+                        value={userData.clipOffsetFrame}
+                        onChange={(e) => onClipOffsetFrameChange(file.trackItem.nodeId, Number(e.target.value))}
                         className="w-24 px-2 py-1 bg-neutral-600 text-white rounded text-right text-xs"
                         step="1"
                     />
-                    <span className="text-neutral-400">ms</span>
+                    <span className="text-neutral-400">f</span>
                 </div>
             </div>
 

@@ -1,6 +1,6 @@
 import {MOCK_DELAY, logApiCall} from './constants';
 import {evalTS} from "../../lib/utils/bolt";
-import {TimeVO} from "../../../shared/vo";
+import {SequenceVO, TimeVO} from "../../../shared/vo";
 
 export const openSequence = async (sequenceId: string): Promise<void> => {
     logApiCall('openSequence', 'start', {sequenceId});
@@ -14,3 +14,10 @@ export const readTrackStartOffset = async (sequenceId: string, trackNumber: numb
     logApiCall('readTrackStartOffset', 'end', result);
     return result.startOffset;
 };
+
+export const readSequence = async (sequenceId: string): Promise<SequenceVO | null> => {
+    logApiCall('readSequence', 'start', {sequenceId});
+    const result = await evalTS('readSequence', sequenceId);
+    logApiCall('readSequence', 'end', result);
+    return result.sequence;
+}

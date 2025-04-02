@@ -6,7 +6,7 @@ import {TimeGap} from './TimeGap';
 import {Plus, FilePlus, ChevronDown, ChevronRight} from 'lucide-react';
 import {VideoSkeleton} from '../VideoSkeleton';
 import {useTimelineCalculations} from '../../hooks/useTimelineCalculations';
-import {TrackItemVO} from "../../../../shared/vo";
+import {SequenceVO, TrackItemVO} from "../../../../shared/vo";
 import {readTrackStartOffset} from "../../api";
 
 interface Props {
@@ -14,15 +14,16 @@ interface Props {
     videoFiles: { [nodeId: string]: VideoFile };
     selectedTrackItems: TrackItemVO[];
     mainSequenceId?: string;
+    mainSequence: SequenceVO | null;
     isLoading?: boolean;
-    onOffsetChange: (offset: number) => void;
+    onOffsetFrameChange: (offsetFrame: number) => void;
     onTrackNumberChange: (trackNumber: number) => void;
-    onClipOffsetChange: (nodeId: string, offset: number) => void;
+    onClipOffsetFrameChange: (nodeId: string, offsetFrame: number) => void;
     onNameChange: (name: string) => void;
     onDelete: () => void;
     onGroupCreate: (files: VideoFile[]) => void;
     onGroupDelete: (groupId: string) => void;
-    onGroupOffsetChange: (groupId: string, offset: number) => void;
+    onGroupOffsetFrameChange: (groupId: string, offsetFrame: number) => void;
     onFileSelect: (nodeId: string) => void;
     onImportFiles: () => void;
     onSyncListOfClips: () => void;
@@ -34,22 +35,23 @@ export const CameraTimeline: React.FC<Props> = ({
                                                     videoFiles,
                                                     selectedTrackItems,
                                                     mainSequenceId,
+                                                    mainSequence,
                                                     isLoading,
-                                                    onOffsetChange,
+                                                    onOffsetFrameChange,
                                                     onTrackNumberChange,
-                                                    onClipOffsetChange,
+                                                    onClipOffsetFrameChange,
                                                     onNameChange,
                                                     onDelete,
                                                     onGroupCreate,
                                                     onGroupDelete,
-                                                    onGroupOffsetChange,
+                                                    onGroupOffsetFrameChange,
                                                     onFileSelect,
                                                     onImportFiles,
                                                     onSyncListOfClips,
                                                     selections
                                                 }) => {
     const [isExpanded, setIsExpanded] = useState(true);
-    const timelineClips = useTimelineCalculations(camera, videoFiles);
+    const timelineClips = useTimelineCalculations(mainSequence, camera, videoFiles);
 
     const handleFetchTrackOffset = async () => {
         if (!mainSequenceId) {
@@ -60,7 +62,7 @@ export const CameraTimeline: React.FC<Props> = ({
         try {
             const newOffset = await readTrackStartOffset(mainSequenceId, camera.trackNumber);
             if (newOffset !== null) {
-                onOffsetChange(newOffset.seconds);
+                onOffsetFrameChange(newOffset.frames);
             }
         } catch (error) {
             console.error('Failed to fetch track offset:', error);
@@ -98,11 +100,11 @@ export const CameraTimeline: React.FC<Props> = ({
                     <CameraHeader
                         name={camera.name}
                         trackNumber={camera.trackNumber}
-                        offset={camera.offset}
+                        offsetFrame={camera.offsetFrame}
                         onNameChange={onNameChange}
                         onTrackNumberChange={onTrackNumberChange}
                         onDelete={onDelete}
-                        onOffsetChange={onOffsetChange}
+                        onOffsetFrameChange={onOffsetFrameChange}
                         onFetchTrackOffset={handleFetchTrackOffset}
                         isExpanded={isExpanded}
                     />
@@ -111,7 +113,7 @@ export const CameraTimeline: React.FC<Props> = ({
                         <div className="text-sm text-neutral-400">
                             <div className="flex items-center gap-4">
                                 <span>Track {camera.trackNumber}</span>
-                                <span>Offset {camera.offset.toFixed(3)}s</span>
+                                <span>Offset {camera.offsetFrame}f</span>
                                 <span>{camera.files.length} clips</span>
                                 <span>{Object.keys(camera.groups).length} groups</span>
                             </div>
@@ -151,17 +153,18 @@ export const CameraTimeline: React.FC<Props> = ({
                             <>
                                 {timelineClips.map(clip => (
                                     <div key={clip.file.trackItem.nodeId}>
-                                        {clip.gap > 0 && clip.showGap && <TimeGap gap={clip.gap}/>}
+                                        {clip.gapFrame > 0 && clip.showGap && mainSequence && <TimeGap gapFrame={clip.gapFrame} frameCountInSecond={mainSequence.videoFrameCountInSecond} />}
                                         <VideoClip
+                                            sequence={mainSequence}
                                             file={clip.file}
                                             userData={clip.userData}
                                             group={clip.userData.groupId ? camera.groups[clip.userData.groupId] : undefined}
                                             isFirstInGroup={clip.isFirstInGroup}
                                             onSelect={() => onFileSelect(clip.file.trackItem.nodeId)}
-                                            onClipOffsetChange={onClipOffsetChange}
-                                            onGroupOffsetChange={
+                                            onClipOffsetFrameChange={onClipOffsetFrameChange}
+                                            onGroupOffsetFrameChange={
                                                 clip.userData.groupId
-                                                    ? (offset) => onGroupOffsetChange(clip.userData.groupId!, offset)
+                                                    ? (offsetFrame) => onGroupOffsetFrameChange(clip.userData.groupId!, offsetFrame)
                                                     : undefined
                                             }
                                             onGroupDelete={
@@ -169,8 +172,8 @@ export const CameraTimeline: React.FC<Props> = ({
                                                     ? () => onGroupDelete(clip.userData.groupId!)
                                                     : undefined
                                             }
-                                            adjustedStartTime={clip.adjustedStartTime}
-                                            adjustedEndTime={clip.adjustedEndTime}
+                                            adjustedStartFrame={clip.adjustedStartFrame}
+                                            adjustedEndFrame={clip.adjustedEndFrame}
                                             isSelected={selections[clip.file.trackItem.nodeId]?.selected || false}
                                             isPremiereSelected={isPremiereSelected(clip.file.trackItem.nodeId)}
                                         />

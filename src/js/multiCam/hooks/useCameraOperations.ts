@@ -20,7 +20,7 @@ export const useCameraOperations = (
       name: generateCameraName(cameras.length),
       trackNumber: nextTrackNumber,
       files: [],
-      offset: 0,
+      offsetFrame: 0,
       groups: {}
     };
 
@@ -61,7 +61,7 @@ export const useCameraOperations = (
         const newFiles = result.videos.map(file => ({
           nodeId: file.trackItem.nodeId,
           userData: {
-            clipOffset: 0
+            clipOffsetFrame: 0
           }
         }));
 

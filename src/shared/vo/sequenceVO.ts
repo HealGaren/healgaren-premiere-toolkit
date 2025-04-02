@@ -7,6 +7,7 @@ export interface SequenceVO {
     videoDisplayFormat: number;
     videoFrameRate: TimeVO;
     videoFrameRateFormatted: string;
+    videoFrameCountInSecond: number;
     videoFrameWidth: number;
     videoFrameHeight: number;
     audioDisplayFormat: number;

@@ -7,9 +7,9 @@ interface Props {
     onNameChange: (name: string) => void;
     onTrackNumberChange: (trackNumber: number) => void;
     onDelete: () => void;
-    onOffsetChange: (offset: number) => void;
+    onOffsetFrameChange: (offsetFrame: number) => void;
     onFetchTrackOffset?: () => void;
-    offset: number;
+    offsetFrame: number;
     isExpanded: boolean;
 }
 
@@ -19,9 +19,9 @@ export const CameraHeader: React.FC<Props> = ({
                                                   onNameChange,
                                                   onTrackNumberChange,
                                                   onDelete,
-                                                  onOffsetChange,
+                                                  onOffsetFrameChange,
                                                   onFetchTrackOffset,
-                                                  offset,
+                                                  offsetFrame,
                                                   isExpanded
                                               }) => {
     const [isEditing, setIsEditing] = useState(false);
@@ -102,9 +102,10 @@ export const CameraHeader: React.FC<Props> = ({
                         <div className="flex items-center gap-1">
                             <input
                                 type="number"
-                                value={offset}
-                                onChange={(e) => onOffsetChange(Number(e.target.value))}
+                                value={offsetFrame}
+                                onChange={(e) => onOffsetFrameChange(Number(e.target.value))}
                                 className="w-20 px-2 py-1 bg-neutral-700 text-white rounded text-right"
+                                step={1}
                             />
                             {onFetchTrackOffset && (
                                 <button
@@ -116,7 +117,7 @@ export const CameraHeader: React.FC<Props> = ({
                                 </button>
                             )}
                         </div>
-                        <span className="text-neutral-400">s</span>
+                        <span className="text-neutral-400">f</span>
                     </div>
                 </div>
             )}

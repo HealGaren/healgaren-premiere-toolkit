@@ -1,8 +1,8 @@
 import {createArray} from "../utils/array";
 import {readCreateDateMillsFromXMPMeta} from "./utils/xmp";
-import {Camera} from "../../js/multiCam/types";
-import {setTrackItemStartTime, setTrackItemStartTimeWithLinkedItems} from "./utils/trackItem";
+import {setTrackItemStartTimeWithLinkedItems} from "./utils/trackItem";
 import {NormalizedTrackItemStartTimeInCamera} from "../../shared/vo/normalizedTrackItemOffsetVO";
+import {getSecondsByFrames} from "./utils/frameRate";
 
 
 function findBinInRoot(project: Project, name: string) {
@@ -54,7 +54,7 @@ function importVideos(project: Project, targetBin: ProjectItem): { success: fals
     };
 }
 
-function getSequence(project: Project, sequenceId: string) {
+export function getSequence(project: Project, sequenceId: string) {
     const sequences = createArray(project.sequences, 'numSequences');
     return sequences.find(sequence => sequence.sequenceID === sequenceId) ?? null;
 }
@@ -68,12 +68,7 @@ export function importVideosWithCameraBin(project: Project, cameraName: string) 
     return importVideos(project, targetBin);
 }
 
-export function overwriteClipWithCreateDate(project: Project, sequenceId: string, trackNum: number, videoProjectItems: ProjectItem[]) {
-    const sequence = getSequence(project, sequenceId);
-    if (!sequence) {
-        throw new Error("Sequence not found");
-    }
-
+export function overwriteClipWithCreateDate(sequence: Sequence, trackNum: number, videoProjectItems: ProjectItem[]) {
     const videoProjectItemsWithCreateDate = videoProjectItems.map(item => {
         const createDate = readCreateDateMillsFromXMPMeta(item);
         if (createDate === null) {
@@ -115,24 +110,14 @@ function flatMap<T, U>(array: T[], callback: (value: T, index: number, array: T[
     }, []);
 }
 
-export function readVideoClips(project: Project, sequenceId: string, cameraNums: number[]) {
-    const sequence = getSequence(project, sequenceId);
-    if (!sequence) {
-        throw new Error("Sequence not found");
-    }
-
+export function readVideoClips(sequence: Sequence, cameraNums: number[]) {
     return flatMap(cameraNums, cameraNum => {
         const cameraTrackClips = createArray(sequence.videoTracks[cameraNum].clips, 'numItems');
         return cameraTrackClips.map(trackItem => ({projectItem: trackItem.projectItem, trackItem}))
     });
 }
 
-export function readSequenceTrackFirstClipOffset(project: Project, sequenceId: string, trackNum: number) {
-    const sequence = getSequence(project, sequenceId);
-    if (!sequence) {
-        throw new Error("Sequence not found");
-    }
-
+export function readSequenceTrackFirstClipOffset(sequence: Sequence, trackNum: number) {
     const trackClips = createArray(sequence.videoTracks[trackNum].clips, 'numItems');
     if (trackClips.length === 0) {
         return null;
@@ -149,12 +134,12 @@ export function syncAllClipStartTimeInCamera(project: Project, sequenceId: strin
     }
 
     const trackNumber = camera.trackNumber;
-    const clips = readVideoClips(project, sequenceId, [trackNumber]);
+    const clips = readVideoClips(sequence, [trackNumber]);
     clips.forEach(clip => {
         const trackItemStartTimeVO = camera.trackItemStartTimeRecord[clip.trackItem.nodeId];
         if (!trackItemStartTimeVO) {
             throw new Error("Track item start time not found");
         }
-        setTrackItemStartTimeWithLinkedItems(clip.trackItem, trackItemStartTimeVO.startTimeSeconds);
+        setTrackItemStartTimeWithLinkedItems(clip.trackItem, getSecondsByFrames(trackItemStartTimeVO.startTime.frames, sequence.getSettings().videoFrameRate));
     });
 }
