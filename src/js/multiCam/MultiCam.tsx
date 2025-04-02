@@ -3,7 +3,8 @@ import {CameraTimeline} from './components/CameraTimeline';
 import {CameraSkeleton} from './components/CameraSkeleton';
 import {SequenceSettings} from './components/SequenceSettings';
 import {SelectionToolbar} from './components/SelectionToolbar';
-import {Plus, Download, Upload, Trash2} from 'lucide-react';
+import {BottomBar} from './components/BottomBar';
+import {Plus, Trash2} from 'lucide-react';
 import {useSequence} from './hooks/useSequence';
 import {useCameras} from './hooks/useCameras';
 import {useInitialState} from './hooks/useInitialState';
@@ -248,94 +249,93 @@ export function MultiCam({defaultActiveSequence}: Props) {
         }
     };
 
+    const handleSyncPremiereSelection = () => {
+        // Clear existing selections
+        Object.keys(selections).forEach(nodeId => {
+            if (selections[nodeId]?.selected) {
+                handleFileSelect(nodeId);
+            }
+        });
+
+        // Select items that are selected in Premiere
+        selectedTrackItems.forEach(item => {
+            if (!selections[item.nodeId]?.selected) {
+                handleFileSelect(item.nodeId);
+            }
+        });
+    };
+
     return (
         <div
             ref={scrollContainerRef}
-            className={`min-h-screen bg-neutral-900 text-white p-4 ${
+            className={`min-h-screen bg-neutral-900 text-white ${
                 isSyncing ? 'opacity-50 pointer-events-none' : ''
             }`}
         >
-            <div className="max-w-2xl mx-auto">
-                <SequenceSettings
-                    activeSequence={activeSequence}
-                    mainSequenceId={mainSequenceId}
-                    onSetMainSequence={handleSetMainSequence}
-                    onOpenMainSequence={handleOpenMainSequence}
-                />
+            <div className="pb-[60px]"> {/* Add padding to account for the fixed bottom bar */}
+                <div className="max-w-2xl mx-auto p-4">
+                    <SequenceSettings
+                        activeSequence={activeSequence}
+                        mainSequenceId={mainSequenceId}
+                        onSetMainSequence={handleSetMainSequence}
+                        onOpenMainSequence={handleOpenMainSequence}
+                    />
 
-                <div className="flex justify-between items-center mb-6">
-                    <button
-                        onClick={handleClearAppState}
-                        className="flex items-center gap-1.5 px-2.5 py-1.5 bg-red-600 hover:bg-red-700 disabled:bg-red-800 disabled:cursor-not-allowed rounded-lg transition-colors text-sm whitespace-nowrap"
-                    >
-                        <Trash2 size={14}/>
-                        <span>초기화</span>
-                    </button>
-
-                    <div className="flex items-center gap-2">
+                    <div className="flex justify-between items-center mb-6">
                         <button
-                            onClick={handleSyncFromPremiere}
-                            disabled={isInitialLoading || isSyncing || cameras.length === 0}
-                            className="flex items-center gap-1.5 px-2.5 py-1.5 bg-green-600 hover:bg-green-700 disabled:bg-green-800 disabled:cursor-not-allowed rounded-lg transition-colors text-sm whitespace-nowrap"
+                            onClick={handleClearAppState}
+                            className="flex items-center gap-1.5 px-2.5 py-1.5 bg-red-600 hover:bg-red-700 disabled:bg-red-800 disabled:cursor-not-allowed rounded-lg transition-colors text-sm whitespace-nowrap"
                         >
-                            <Download size={14} className={isSyncing ? 'animate-spin' : ''}/>
-                            <span>From Premiere</span>
-                        </button>
-                        <button
-                            onClick={handleSyncToPremiere}
-                            disabled={isInitialLoading || isSyncing || cameras.length === 0}
-                            className="flex items-center gap-1.5 px-2.5 py-1.5 bg-green-600 hover:bg-green-700 disabled:bg-green-800 disabled:cursor-not-allowed rounded-lg transition-colors text-sm whitespace-nowrap"
-                        >
-                            <Upload size={14} className={isSyncing ? 'animate-spin' : ''}/>
-                            <span>To Premiere</span>
+                            <Trash2 size={14}/>
+                            <span>초기화</span>
                         </button>
                     </div>
-                </div>
 
-                <div className="space-y-4">
-                    {isInitialLoading ? (
-                        <>
-                            <CameraSkeleton/>
-                            <CameraSkeleton/>
-                        </>
-                    ) : (
-                        <>
-                            {cameras.map(camera => (
-                                <CameraTimeline
-                                    key={camera.id}
-                                    camera={camera}
-                                    videoFiles={videoFiles}
-                                    selectedTrackItems={selectedTrackItems || []}
-                                    mainSequenceId={mainSequenceId}
-                                    mainSequence={mainSequence}
-                                    isLoading={loadingCameraIds.has(camera.id)}
-                                    onOffsetFrameChange={(offset) => handleOffsetFrameChange(camera.id, offset)}
-                                    onTrackNumberChange={(trackNumber) => handleTrackNumberChange(camera.id, trackNumber)}
-                                    onClipOffsetFrameChange={(nodeId, offset) => handleClipOffsetFrameChange(camera.id, nodeId, offset)}
-                                    onNameChange={(name) => handleNameChange(camera.id, name)}
-                                    onDelete={() => handleDeleteCamera(camera.id)}
-                                    onFileSelect={handleFileSelect}
-                                    onGroupCreate={(files) => handleGroupCreate(camera.id, files)}
-                                    onGroupDelete={(groupId) => handleGroupDelete(camera.id, groupId)}
-                                    onGroupOffsetFrameChange={(groupId, offset) => handleGroupOffsetFrameChange(camera.id, groupId, offset)}
-                                    onImportFiles={() => handleImportFiles(camera.id)}
-                                    onSyncListOfClips={() => handleSyncListOfClipsInCamera(camera.id)}
-                                    selections={selections}
-                                />
-                            ))}
-                            <button
-                                onClick={handleAddCamera}
-                                disabled={isInitialLoading || isSyncing}
-                                className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-neutral-800 hover:bg-neutral-700 disabled:bg-neutral-800 disabled:cursor-not-allowed rounded-lg transition-colors text-neutral-400 hover:text-white group"
-                            >
-                                <Plus
-                                    size={18}
-                                    className="transition-transform group-hover:scale-110"
-                                />
-                                <span className="font-medium">새 카메라 추가</span>
-                            </button>
-                        </>
-                    )}
+                    <div className="space-y-4">
+                        {isInitialLoading ? (
+                            <>
+                                <CameraSkeleton/>
+                                <CameraSkeleton/>
+                            </>
+                        ) : (
+                            <>
+                                {cameras.map(camera => (
+                                    <CameraTimeline
+                                        key={camera.id}
+                                        camera={camera}
+                                        videoFiles={videoFiles}
+                                        selectedTrackItems={selectedTrackItems || []}
+                                        mainSequenceId={mainSequenceId}
+                                        mainSequence={mainSequence}
+                                        isLoading={loadingCameraIds.has(camera.id)}
+                                        onOffsetFrameChange={(offset) => handleOffsetFrameChange(camera.id, offset)}
+                                        onTrackNumberChange={(trackNumber) => handleTrackNumberChange(camera.id, trackNumber)}
+                                        onClipOffsetFrameChange={(nodeId, offset) => handleClipOffsetFrameChange(camera.id, nodeId, offset)}
+                                        onNameChange={(name) => handleNameChange(camera.id, name)}
+                                        onDelete={() => handleDeleteCamera(camera.id)}
+                                        onFileSelect={handleFileSelect}
+                                        onGroupCreate={(files) => handleGroupCreate(camera.id, files)}
+                                        onGroupDelete={(groupId) => handleGroupDelete(camera.id, groupId)}
+                                        onGroupOffsetFrameChange={(groupId, offset) => handleGroupOffsetFrameChange(camera.id, groupId, offset)}
+                                        onImportFiles={() => handleImportFiles(camera.id)}
+                                        onSyncListOfClips={() => handleSyncListOfClipsInCamera(camera.id)}
+                                        selections={selections}
+                                    />
+                                ))}
+                                <button
+                                    onClick={handleAddCamera}
+                                    disabled={isInitialLoading || isSyncing}
+                                    className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-neutral-800 hover:bg-neutral-700 disabled:bg-neutral-800 disabled:cursor-not-allowed rounded-lg transition-colors text-neutral-400 hover:text-white group"
+                                >
+                                    <Plus
+                                        size={18}
+                                        className="transition-transform group-hover:scale-110"
+                                    />
+                                    <span className="font-medium">새 카메라 추가</span>
+                                </button>
+                            </>
+                        )}
+                    </div>
                 </div>
             </div>
 
@@ -347,6 +347,15 @@ export function MultiCam({defaultActiveSequence}: Props) {
                     isConsecutive={isConsecutiveSelection()}
                 />
             )}
+
+            <BottomBar
+                selectedTrackItems={selectedTrackItems}
+                onSyncPremiereSelection={handleSyncPremiereSelection}
+                onSyncFromPremiere={handleSyncFromPremiere}
+                onSyncToPremiere={handleSyncToPremiere}
+                isSyncing={isSyncing}
+                isDisabled={isInitialLoading || isSyncing || cameras.length === 0}
+            />
 
             {isSyncing && (
                 <div className="fixed inset-0 bg-black/50 flex items-center justify-center">
