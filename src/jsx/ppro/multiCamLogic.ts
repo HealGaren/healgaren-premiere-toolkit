@@ -1,5 +1,8 @@
 import {createArray} from "../utils/array";
 import {readCreateDateMillsFromXMPMeta} from "./utils/xmp";
+import {Camera} from "../../js/multiCam/types";
+import {setTrackItemStartTime, setTrackItemStartTimeWithLinkedItems} from "./utils/trackItem";
+import {NormalizedTrackItemStartTimeInCamera} from "../../shared/vo/normalizedTrackItemOffsetVO";
 
 
 function findBinInRoot(project: Project, name: string) {
@@ -65,7 +68,7 @@ export function importVideosWithCameraBin(project: Project, cameraName: string) 
     return importVideos(project, targetBin);
 }
 
-export function insertClipWithCreateDate(project: Project, sequenceId: string, trackNum: number, videoProjectItems: ProjectItem[]) {
+export function overwriteClipWithCreateDate(project: Project, sequenceId: string, trackNum: number, videoProjectItems: ProjectItem[]) {
     const sequence = getSequence(project, sequenceId);
     if (!sequence) {
         throw new Error("Sequence not found");
@@ -88,7 +91,8 @@ export function insertClipWithCreateDate(project: Project, sequenceId: string, t
     const firstVideoCreateDate = videoProjectItemsWithCreateDate[0].createDate;
     videoProjectItemsWithCreateDate.forEach(videoProjectItem => {
         const deltaSeconds = (videoProjectItem.createDate - firstVideoCreateDate) / 1000;
-        sequence.insertClip(videoProjectItem.projectItem, secondsAsTime(deltaSeconds), trackNum, trackNum);
+        // @ts-ignore
+        sequence.overwriteClip(videoProjectItem.projectItem, secondsAsTime(deltaSeconds), trackNum, trackNum);
     });
 
     const clips = createArray(sequence.videoTracks[trackNum].clips, 'numItems');
@@ -136,4 +140,21 @@ export function readSequenceTrackFirstClipOffset(project: Project, sequenceId: s
 
     const firstClip = trackClips[0];
     return firstClip.start;
+}
+
+export function syncAllClipStartTimeInCamera(project: Project, sequenceId: string, camera: NormalizedTrackItemStartTimeInCamera) {
+    const sequence = getSequence(project, sequenceId);
+    if (!sequence) {
+        throw new Error("Sequence not found");
+    }
+
+    const trackNumber = camera.trackNumber;
+    const clips = readVideoClips(project, sequenceId, [trackNumber]);
+    clips.forEach(clip => {
+        const trackItemStartTimeVO = camera.trackItemStartTimeRecord[clip.trackItem.nodeId];
+        if (!trackItemStartTimeVO) {
+            throw new Error("Track item start time not found");
+        }
+        setTrackItemStartTimeWithLinkedItems(clip.trackItem, trackItemStartTimeVO.startTimeSeconds);
+    });
 }

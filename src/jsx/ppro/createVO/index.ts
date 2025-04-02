@@ -50,12 +50,16 @@ export function createTrackItemVO(trackItem: TrackItem): TrackItemVO {
 }
 
 export function createProjectItemVO(projectItem: ProjectItem): ProjectItemVO {
+    const createdAt = readCreateDateMillsFromXMPMeta(projectItem);
+    if (createdAt === null) {
+        throw new Error("createdAt is null");
+    }
     return {
         name: projectItem.name,
         mediaPath: projectItem.getMediaPath(),
         outPoint: createTimeVO(projectItem.getOutPoint()), // duration 용도로 사용
         nodeId: projectItem.nodeId,
-        createdAt: readCreateDateMillsFromXMPMeta(projectItem),
+        createdAt
     };
 }
 

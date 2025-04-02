@@ -5,5 +5,5 @@ export interface ProjectItemVO {
     mediaPath: string;
     outPoint: TimeVO;
     nodeId: string;
-    createdAt: number | null;
+    createdAt: number;
 }

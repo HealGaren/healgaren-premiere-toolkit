@@ -1,15 +1,15 @@
 import { useState } from 'react';
 import { Camera, VideoFileUIState } from '../types';
-import { createVideoFromTrackItem } from '../api';
 import { saveState } from '../utils/storage';
 import { useVideoFiles } from '../contexts/VideoFilesContext';
 import { useCameraOperations } from './useCameraOperations';
 import { useGroupOperations } from './useGroupOperations';
 import { CAMERA_DEFAULTS } from '../constants/camera';
-import {TrackItemVO} from "../../../shared/vo";
+import {sortFilesByStartTime} from "../utils/camera";
+import {produce} from "immer";
 
 export const useCameras = (mainSequenceId: string | undefined) => {
-  const { videoFiles, setVideoFiles } = useVideoFiles();
+  const { videoFiles, setVideoFiles, loadVideoFiles } = useVideoFiles();
   const [cameras, setCameras] = useState<Camera[]>([]);
   const [selections, setSelections] = useState<{ [nodeId: string]: VideoFileUIState }>({});
   const [nextTrackNumber, setNextTrackNumber] = useState(CAMERA_DEFAULTS.MIN_TRACK_NUMBER);
@@ -34,31 +34,50 @@ export const useCameras = (mainSequenceId: string | undefined) => {
     setNextTrackNumber(prev => prev + 1);
   };
 
-  const handleAddSelectedClips = async (cameraId: string, selectedClips: TrackItemVO[]) => {
-    const updatedCameras = cameras.map(camera => {
-      if (camera.id !== cameraId) return camera;
+  const handleSyncListOfClipsInCamera = async (cameraId: string) => {
+    if (mainSequenceId === undefined) {
+      alert('No sequence selected');
+      return;
+    }
 
-      const newFiles = selectedClips.map(clip => ({
-        nodeId: clip.nodeId,
-        userData: {
-          clipOffset: CAMERA_DEFAULTS.DEFAULT_CLIP_OFFSET
-        }
-      }));
+    const cameraIndex = cameras.findIndex(camera => camera.id === cameraId);
+    if (cameraIndex === -1) {
+      console.error('Camera not found:', cameraId);
+      return;
+    }
+    const oldCameraState = cameras[cameraIndex]
 
-      return {
-        ...camera,
-        files: [...camera.files, ...newFiles]
-      };
+    const trackNumber = oldCameraState.trackNumber;
+
+    const videoFiles = await loadVideoFiles(mainSequenceId, [trackNumber]);
+
+    const removedVideos = oldCameraState.files.filter(video => {
+        return !videoFiles[video.nodeId]
     });
+    const filesToKeep = oldCameraState.files.filter(file => !removedVideos.some(removed => removed.nodeId === file.nodeId));
 
-    const newVideoFiles = selectedClips.reduce((acc, clip) => ({
-      ...acc,
-      [clip.nodeId]: createVideoFromTrackItem(clip)
-    }), {});
+    const unloadedVideos = Object.values(videoFiles)
+        .filter((video) => {
+          return !oldCameraState.files.some(file => file.nodeId === video.trackItem.nodeId);
+        });
 
-    setVideoFiles(prev => ({ ...prev, ...newVideoFiles }));
-    setCameras(updatedCameras);
-    await saveState(updatedCameras, mainSequenceId);
+    const newFiles = unloadedVideos.map(video => ({
+      nodeId: video.trackItem.nodeId,
+      userData: {
+        clipOffset: 0
+      }
+    }));
+
+
+    setCameras(produce(draft => {
+      draft[cameraIndex].files = sortFilesByStartTime([...filesToKeep, ...newFiles], videoFiles)
+    }));
+  };
+
+  const handleSyncListOfClipsInAllCamera = async () => {
+    for (const camera of cameras) {
+      await handleSyncListOfClipsInCamera(camera.id);
+    }
   };
 
   const handleFileSelect = (nodeId: string) => {
@@ -124,7 +143,8 @@ export const useCameras = (mainSequenceId: string | undefined) => {
     setIsInitialLoading,
     handleAddCamera,
     handleImportFiles,
-    handleAddSelectedClips,
+    handleSyncListOfClipsInCamera,
+    handleSyncListOfClipsInAllCamera,
     handleOffsetChange,
     handleTrackNumberChange,
     handleClipOffsetChange,

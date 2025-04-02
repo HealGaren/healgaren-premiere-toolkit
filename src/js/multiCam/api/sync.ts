@@ -1,4 +1,6 @@
 import { MOCK_DELAY, logApiCall } from './constants';
+import {evalTS} from "../../lib/utils/bolt";
+import {NormalizedTrackItemStartTimeInCamera} from "../../../shared/vo/normalizedTrackItemOffsetVO";
 
 export const syncFromPremiere = async (): Promise<{ [path: string]: number }> => {
   logApiCall('syncFromPremiere', 'start');
@@ -15,8 +17,8 @@ export const syncFromPremiere = async (): Promise<{ [path: string]: number }> =>
   return result;
 };
 
-export const syncToPremiere = async (offsets: { [path: string]: number }): Promise<void> => {
-  logApiCall('syncToPremiere', 'start', offsets);
-  await new Promise(resolve => setTimeout(resolve, MOCK_DELAY * 2));
-  logApiCall('syncToPremiere', 'end');
+export const syncAllClipStartTime = async (mainSequenceId: string, cameras: NormalizedTrackItemStartTimeInCamera[]): Promise<void> => {
+  logApiCall('syncAllClipStartTime', 'start', { mainSequenceId, cameras });
+  await evalTS('syncAllClipStartTime', mainSequenceId, cameras);
+  logApiCall('syncAllClipStartTime', 'end');
 };

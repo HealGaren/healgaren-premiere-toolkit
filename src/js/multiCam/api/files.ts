@@ -19,16 +19,3 @@ export const readVideos = async (mainSequenceId: string, cameraNums: number[]): 
     logApiCall('readVideos', 'end', result);
     return result;
 };
-
-export const createVideoFromTrackItem = (trackItem: TrackItemVO): VideoFile => {
-    return {
-        projectItem: {
-            name: trackItem.name,
-            mediaPath: `/videos/${trackItem.name}`,
-            outPoint: trackItem.outPoint,
-            nodeId: trackItem.nodeId,
-            createdAt: null
-        },
-        trackItem
-    };
-};

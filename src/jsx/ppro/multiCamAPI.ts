@@ -1,13 +1,15 @@
 import {
     importVideosWithCameraBin,
-    insertClipWithCreateDate,
+    overwriteClipWithCreateDate,
     readSequenceTrackFirstClipOffset,
-    readVideoClips
+    readVideoClips, syncAllClipStartTimeInCamera
 } from "./multiCamLogic";
 import {createProjectItemVO, createTimeVO, createTrackItemVO} from "./createVO";
 import {readJSONFromXMPMeta, writeJSONToXMPMeta} from "./customXMP";
 import {ProjectItemVO} from "../../shared/vo/projectItemVO";
 import {TimeVO, TrackItemVO} from "../../shared/vo";
+import {AppState, Camera} from "../../js/multiCam/types";
+import {NormalizedTrackItemStartTimeInCamera} from "../../shared/vo/normalizedTrackItemOffsetVO";
 
 export function importAndInsertCameraVideos(mainSequenceId: string, cameraName: string, trackNum: number): {success: false} | {success: true, videos: {projectItem: ProjectItemVO, trackItem: TrackItemVO}[]} {
     const project = app.project;
@@ -15,7 +17,7 @@ export function importAndInsertCameraVideos(mainSequenceId: string, cameraName: 
     if (!importVideoResult.success) {
         return {success: false};
     }
-    const videos = insertClipWithCreateDate(project, mainSequenceId, trackNum, importVideoResult.projectItems);
+    const videos = overwriteClipWithCreateDate(project, mainSequenceId, trackNum, importVideoResult.projectItems);
 
     return {
         success: true,
@@ -63,4 +65,11 @@ export function readTrackStartOffset(sequenceId: string, trackNumber: number): {
     return {
         startOffset: offset ? createTimeVO(offset) : null
     };
+}
+
+export function syncAllClipStartTime(mainSequenceId: string, cameras: NormalizedTrackItemStartTimeInCamera[]) {
+    const project = app.project;
+    cameras.forEach(camera => {
+        syncAllClipStartTimeInCamera(project, mainSequenceId, camera);
+    });
 }

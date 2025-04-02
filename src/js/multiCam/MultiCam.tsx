@@ -8,9 +8,14 @@ import {useSequence} from './hooks/useSequence';
 import {useCameras} from './hooks/useCameras';
 import {useInitialState} from './hooks/useInitialState';
 import {useAutoScroll} from './hooks/useAutoScroll';
-import {syncFromPremiere, syncToPremiere} from './api';
+import {syncFromPremiere, syncAllClipStartTime} from './api';
 import {saveState, clearState} from './utils/storage';
 import {SequenceVO} from "../../shared/vo";
+import {
+    NormalizedTrackItemStartTimeInCamera,
+    NormalizedTrackItemStartTimeVO
+} from "../../shared/vo/normalizedTrackItemOffsetVO";
+import {Camera} from "./types";
 
 interface Props {
     defaultActiveSequence: SequenceVO | null;
@@ -38,7 +43,8 @@ export function MultiCam({defaultActiveSequence}: Props) {
         setIsInitialLoading,
         handleAddCamera,
         handleImportFiles,
-        handleAddSelectedClips,
+        handleSyncListOfClipsInCamera,
+        handleSyncListOfClipsInAllCamera,
         handleOffsetChange,
         handleTrackNumberChange,
         handleClipOffsetChange,
@@ -47,7 +53,7 @@ export function MultiCam({defaultActiveSequence}: Props) {
         handleFileSelect,
         handleGroupCreate,
         handleGroupDelete,
-        handleGroupOffsetChange
+        handleGroupOffsetChange,
     } = useCameras(mainSequenceId);
 
     useInitialState(setIsInitialLoading, setCameras, setMainSequenceId);
@@ -160,20 +166,50 @@ export function MultiCam({defaultActiveSequence}: Props) {
 
     const handleSyncToPremiere = async () => {
         if (isSyncing) return;
+        if (!mainSequenceId) return;
 
-        try {
-            const offsets: { [path: string]: number } = {};
-            cameras.forEach(camera => {
-                camera.files.forEach(file => {
-                    const videoFile = videoFiles[file.nodeId];
-                    if (videoFile) {
-                        const groupOffset = file.userData.groupId ? camera.groups[file.userData.groupId].offset : 0;
-                        offsets[videoFile.trackItem.nodeId] = file.userData.clipOffset + groupOffset;
-                    }
-                });
+        function createTrackItemStartTimesOfCamera(camera: Camera): NormalizedTrackItemStartTimeInCamera {
+            if (camera.files.length === 0) {
+                return {
+                    trackItemStartTimeRecord: {},
+                    trackNumber: camera.trackNumber
+                };
+            }
+
+            const firstClip = camera.files[0];
+            const firstClipProjectItem = videoFiles[firstClip.nodeId].projectItem;
+            const firstClipCreatedAt = firstClipProjectItem.createdAt;
+
+            const trackItemStartTimes: NormalizedTrackItemStartTimeVO[] = camera.files.map(file => {
+                const videoFile = videoFiles[file.nodeId];
+                if (!videoFile) {
+                    throw new Error(`Video file not found for nodeId: ${file.nodeId}`);
+                }
+                const clipCreatedAt = videoFile.projectItem.createdAt;
+                const createdDelta = clipCreatedAt - firstClipCreatedAt;
+                const createdDeltaSeconds = createdDelta / 1000;
+
+                return {
+                    trackItemNodeId: videoFile.trackItem.nodeId,
+                    startTimeSeconds: createdDeltaSeconds + camera.offset + file.userData.clipOffset / 1000
+                };
             });
 
-            await syncToPremiere(offsets);
+            const trackItemStartTimeRecord: Record<string, NormalizedTrackItemStartTimeVO> = {};
+            trackItemStartTimes.forEach(trackItemStartTime => {
+                trackItemStartTimeRecord[trackItemStartTime.trackItemNodeId] = trackItemStartTime;
+            });
+
+            return {
+                trackItemStartTimeRecord,
+                trackNumber: camera.trackNumber
+            };
+        }
+
+        try {
+            const trackItemStartTimesOfCameras: NormalizedTrackItemStartTimeInCamera[] = cameras.map(camera => createTrackItemStartTimesOfCamera(camera));
+            await syncAllClipStartTime(mainSequenceId, trackItemStartTimesOfCameras);
+            await handleSyncListOfClipsInAllCamera();
         } catch (error) {
             console.error('Error syncing to Premiere:', error);
         }
@@ -265,7 +301,7 @@ export function MultiCam({defaultActiveSequence}: Props) {
                                     onGroupDelete={(groupId) => handleGroupDelete(camera.id, groupId)}
                                     onGroupOffsetChange={(groupId, offset) => handleGroupOffsetChange(camera.id, groupId, offset)}
                                     onImportFiles={() => handleImportFiles(camera.id)}
-                                    onAddSelectedClips={() => handleAddSelectedClips(camera.id, selectedTrackItems || [])}
+                                    onSyncListOfClips={() => handleSyncListOfClipsInCamera(camera.id)}
                                     selections={selections}
                                 />
                             ))}

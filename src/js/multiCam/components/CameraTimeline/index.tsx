@@ -25,7 +25,7 @@ interface Props {
     onGroupOffsetChange: (groupId: string, offset: number) => void;
     onFileSelect: (nodeId: string) => void;
     onImportFiles: () => void;
-    onAddSelectedClips: () => void;
+    onSyncListOfClips: () => void;
     selections: { [nodeId: string]: { selected: boolean } };
 }
 
@@ -45,7 +45,7 @@ export const CameraTimeline: React.FC<Props> = ({
                                                     onGroupOffsetChange,
                                                     onFileSelect,
                                                     onImportFiles,
-                                                    onAddSelectedClips,
+                                                    onSyncListOfClips,
                                                     selections
                                                 }) => {
     const [isExpanded, setIsExpanded] = useState(true);
@@ -132,12 +132,12 @@ export const CameraTimeline: React.FC<Props> = ({
                             <span>새 영상 추가</span>
                         </button>
                         <button
-                            onClick={onAddSelectedClips}
-                            disabled={selectedTrackItems.length === 0 || isLoading}
+                            onClick={onSyncListOfClips}
+                            disabled={isLoading}
                             className="flex items-center gap-1.5 px-2.5 py-1.5 bg-green-600 hover:bg-green-700 disabled:bg-green-800 disabled:cursor-not-allowed rounded text-sm transition-colors"
                         >
                             <Plus size={14}/>
-                            <span>선택된 클립 추가</span>
+                            <span>클립 목록 동기화</span>
                         </button>
                     </div>
 
