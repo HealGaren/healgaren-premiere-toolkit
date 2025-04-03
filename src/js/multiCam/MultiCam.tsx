@@ -208,9 +208,12 @@ export function MultiCam({defaultActiveSequence}: Props) {
                         const prevFile = camera.files[index - 1];
                         if (prevFile.userData.groupId === file.userData.groupId) {
                             startFrame = previousEndFrame;
+                        } else {
+                            startFrame += clipGroup.offsetFrame;
                         }
+                    } else {
+                        startFrame += clipGroup.offsetFrame;
                     }
-                    startFrame += clipGroup.offsetFrame;
                 } else {
                     // In non-continuous mode, use normal offset calculation
                     startFrame += (clipGroup?.offsetFrame ?? 0) + file.userData.clipOffsetFrame;

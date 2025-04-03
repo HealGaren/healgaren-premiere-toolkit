@@ -75,7 +75,6 @@ export const VideoClip: React.FC<Props> = ({
                         onChange={(e) => onGroupOffsetFrameChange?.(Number(e.target.value))}
                         className="w-24 px-2 py-1 bg-neutral-700 text-white rounded text-right text-xs"
                         step="1"
-                        disabled={group.continuous}
                     />
                     <span className="text-neutral-400">f</span>
                     <button

@@ -48,7 +48,6 @@ export const useCameraOperations = (
 
       if (!result.success) return;
 
-      debugger;
       const newVideoFiles = result.videos.reduce((acc, file) => ({
         ...acc,
         [file.trackItem.nodeId]: file

@@ -68,9 +68,12 @@ export const useTimelineCalculations = (
             // If previous clip is in the same group, position this clip right after it
             const prevClip = timelineClipResults[index - 1];
             adjustedStartFrame = prevClip.adjustedEndFrame;
+          } else {
+            adjustedStartFrame += groupOffset;
           }
+        } else {
+          adjustedStartFrame += groupOffset;
         }
-        adjustedStartFrame += groupOffset;
       } else {
         // In non-continuous mode, use normal offset calculation
         adjustedStartFrame += groupOffset + file.userData.clipOffsetFrame;
@@ -78,7 +81,6 @@ export const useTimelineCalculations = (
 
       if (index >= 1) {
         const previousFile = camera.files[index - 1];
-        debugger;
         const previousEndFrame = timelineClipResults[index - 1].adjustedEndFrame;
 
         gapFrame = adjustedStartFrame - previousEndFrame;
